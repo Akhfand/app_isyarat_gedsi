@@ -24,7 +24,7 @@
     object-fit: cover;
 }
 
-/* Tombol Pilihan Jawaban Kuis (Area sentuh besar untuk aksesibilitas motorik) */
+/* Tombol Pilihan Jawaban Kuis */
 .quiz-option-btn {
     text-align: left;
     padding: 14px 18px;
@@ -55,31 +55,79 @@
     color: #721c24 !important;
 }
 
-/* MODE KONTRAS TINGGI (Aksesibilitas Low Vision GEDSI) */
+/* ========================================================= */
+/* MODE KONTRAS TINGGI (Aksesibilitas Low Vision GEDSI)      */
+/* ========================================================= */
 body.high-contrast,
+body.high-contrast #wrapper,
 body.high-contrast #content-wrapper,
 body.high-contrast #content {
     background-color: #000000 !important;
     color: #ffffff !important;
 }
 
-body.high-contrast .card,
-body.high-contrast .modal-content,
 body.high-contrast .topbar,
-body.high-contrast .sticky-footer {
+body.high-contrast .sticky-footer,
+body.high-contrast .bg-white,
+body.high-contrast .bg-light,
+body.high-contrast .card,
+body.high-contrast .card-header,
+body.high-contrast .card-body,
+body.high-contrast .modal-content,
+body.high-contrast .modal-header,
+body.high-contrast .modal-footer,
+body.high-contrast .dropdown-menu {
     background-color: #121212 !important;
     color: #ffffff !important;
+    border-color: #ffdd00 !important;
+}
+
+body.high-contrast .card,
+body.high-contrast .alert,
+body.high-contrast .modal-content {
     border: 2px solid #ffdd00 !important;
 }
 
+body.high-contrast .alert-info,
+body.high-contrast .alert-light {
+    background-color: #1a1a00 !important;
+    color: #ffffff !important;
+}
+
 body.high-contrast .text-dark,
+body.high-contrast .text-gray-800,
+body.high-contrast .text-muted,
 body.high-contrast p,
 body.high-contrast h1,
 body.high-contrast h2,
+body.high-contrast h4,
 body.high-contrast h5,
 body.high-contrast h6,
-body.high-contrast span {
+body.high-contrast span,
+body.high-contrast td,
+body.high-contrast th,
+body.high-contrast .dropdown-item {
     color: #ffffff !important;
+}
+
+body.high-contrast .badge-light {
+    background-color: #000000 !important;
+    color: #ffdd00 !important;
+    border: 1px solid #ffdd00 !important;
+}
+
+body.high-contrast .table,
+body.high-contrast .thead-light th,
+body.high-contrast .form-control,
+body.high-contrast .custom-select {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffdd00 !important;
+}
+
+body.high-contrast .table-primary {
+    background-color: #2b2600 !important;
+    color: #ffdd00 !important;
 }
 
 body.high-contrast .quiz-option-btn {
@@ -88,18 +136,6 @@ body.high-contrast .quiz-option-btn {
     border: 2px solid #ffdd00 !important;
 }
 
-/* Penyesuaian Tabel & Input pada Mode Kontras Tinggi */
-body.high-contrast .table,
-body.high-contrast .table td,
-body.high-contrast .table th,
-body.high-contrast .form-control,
-body.high-contrast .custom-select {
-    background-color: #121212 !important;
-    color: #ffffff !important;
-    border-color: #ffdd00 !important;
-}
-
-body.high-contrast .table-primary {
+body.high-contrast .quiz-option-btn:hover:not(:disabled) {
     background-color: #2b2600 !important;
-    color: #ffdd00 !important;
 }

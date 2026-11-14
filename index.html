@@ -15,7 +15,7 @@
     <!-- Custom styles for SB Admin 2 -->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
     <!-- Custom styles untuk Aplikasi Isyarat & GEDSI -->
-    <link href="css/custom-gedsi.css" rel="stylesheet">
+    <link href="css/custom-gedsi.css?v=2" rel="stylesheet">
 </head>
 
 <body id="page-top">
@@ -143,16 +143,16 @@
                                 <img class="img-profile rounded-circle" src="img/undraw_profile.svg" alt="Foto Profil">
                             </a>
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="#" onclick="resetProgress(); return false;">
-                                    <i class="fas fa-redo fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Reset Progres Demo
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="login.html">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Keluar / Ganti Akun
-                                </a>
-                            </div>
+                            <a class="dropdown-item" href="login.html">
+                                <i class="fas fa-exchange-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Ganti Akun
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger font-weight-bold" href="#" onclick="logoutUser(); return false;">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-danger"></i>
+                                Keluar (Mode Tamu)
+                            </a>
+                        </div>
                         </li>
 
                     </ul>

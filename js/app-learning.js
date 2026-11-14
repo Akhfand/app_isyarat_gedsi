@@ -13,6 +13,7 @@ let currentQuestionIndex = 0;
 let chapterScore = 0;
 
 document.addEventListener("DOMContentLoaded", async () => {
+    applySavedContrast();
     await checkUserSession();
     await loadAllDataFromSupabase();
     updateTopbarUI();
@@ -149,8 +150,24 @@ async function setSignMode(mode, saveToDb = true) {
     renderDictionary();
 }
 
+// Terapkan status kontras yang tersimpan di browser
+function applySavedContrast() {
+    const isHighContrast = localStorage.getItem('highContrast') === 'true';
+    const btn = document.getElementById("btn-contrast");
+    if (isHighContrast) {
+        document.body.classList.add("high-contrast");
+        if (btn) btn.className = "btn btn-sm btn-warning text-dark font-weight-bold";
+    } else {
+        document.body.classList.remove("high-contrast");
+        if (btn) btn.className = "btn btn-sm btn-outline-dark";
+    }
+}
+
+// Toggle Mode Kontras Tinggi (GEDSI Accessibility)
 function toggleHighContrast() {
-    document.body.classList.toggle("high-contrast");
+    const isNowActive = document.body.classList.toggle("high-contrast");
+    localStorage.setItem('highContrast', isNowActive);
+    applySavedContrast();
 }
 
 // Render Kamus dari Data Supabase
@@ -423,9 +440,8 @@ async function nextQuestion() {
     }
 }
 
-async function resetProgress() {
-    if (currentUser) {
-        await supabaseClient.auth.signOut();
-    }
-    window.location.href = "login.html";
+async function logoutUser() {
+    await supabaseClient.auth.signOut();
+    localStorage.removeItem('signMode');
+    window.location.href = "index.html";
 }
