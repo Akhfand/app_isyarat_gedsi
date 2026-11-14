@@ -1,0 +1,89 @@
+/* Kartu Bab ala Duolingo */
+.chapter-card {
+    border-radius: 14px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chapter-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Bingkai Pemutar Video Bahasa Isyarat */
+.video-frame {
+    max-width: 360px;
+    background-color: #1a1c23;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 3px solid #e3e6f0;
+}
+
+.video-frame video {
+    display: block;
+    max-height: 260px;
+    object-fit: cover;
+}
+
+/* Tombol Pilihan Jawaban Kuis (Area sentuh besar untuk aksesibilitas motorik) */
+.quiz-option-btn {
+    text-align: left;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    border: 2px solid #d1d3e2;
+    background-color: #ffffff;
+    color: #2e2f37;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.15s ease;
+}
+
+.quiz-option-btn:hover:not(:disabled) {
+    background-color: #f0f4ff;
+    border-color: #4e73df;
+}
+
+.quiz-option-btn.correct {
+    background-color: #d4edda !important;
+    border-color: #1cc88a !important;
+    color: #155724 !important;
+}
+
+.quiz-option-btn.wrong {
+    background-color: #f8d7da !important;
+    border-color: #e74a3b !important;
+    color: #721c24 !important;
+}
+
+/* MODE KONTRAS TINGGI (Aksesibilitas Low Vision GEDSI) */
+body.high-contrast,
+body.high-contrast #content-wrapper,
+body.high-contrast #content {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+body.high-contrast .card,
+body.high-contrast .modal-content,
+body.high-contrast .topbar,
+body.high-contrast .sticky-footer {
+    background-color: #121212 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffdd00 !important;
+}
+
+body.high-contrast .text-dark,
+body.high-contrast p,
+body.high-contrast h1,
+body.high-contrast h2,
+body.high-contrast h5,
+body.high-contrast h6,
+body.high-contrast span {
+    color: #ffffff !important;
+}
+
+body.high-contrast .quiz-option-btn {
+    background-color: #000000 !important;
+    color: #ffdd00 !important;
+    border: 2px solid #ffdd00 !important;
+}

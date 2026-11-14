@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Aplikasi Belajar Bahasa Isyarat BISINDO, SIBI, dan Literasi GEDSI">
+    <title>IsyaratInklusi - Belajar BISINDO, SIBI & GEDSI</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800" rel="stylesheet">
+
+    <!-- Custom styles for SB Admin 2 -->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <!-- Custom styles untuk Aplikasi Isyarat & GEDSI -->
+    <link href="css/custom-gedsi.css" rel="stylesheet">
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+                <div class="sidebar-brand-icon">
+                    <i class="fas fa-hands"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">Isyarat<sup>GEDSI</sup></div>
+            </a>
+
+            <hr class="sidebar-divider my-0">
+
+            <!-- Menu 1: Peta Belajar -->
+            <li class="nav-item active">
+                <a class="nav-link" href="#section-belajar" onclick="switchSection('belajar')">
+                    <i class="fas fa-fw fa-map-signs"></i>
+                    <span>Peta Belajar</span>
+                </a>
+            </li>
+
+            <hr class="sidebar-divider">
+
+            <div class="sidebar-heading">Eksplorasi & Inklusi</div>
+
+            <!-- Menu 2: Kamus Isyarat -->
+            <li class="nav-item">
+                <a class="nav-link" href="#section-kamus" onclick="switchSection('kamus')">
+                    <i class="fas fa-fw fa-book-open"></i>
+                    <span>Kamus Isyarat</span>
+                </a>
+            </li>
+
+            <!-- Menu 3: Pojok GEDSI -->
+            <li class="nav-item">
+                <a class="nav-link" href="#section-gedsi" onclick="switchSection('gedsi')">
+                    <i class="fas fa-fw fa-universal-access"></i>
+                    <span>Pojok GEDSI</span>
+                </a>
+            </li>
+
+            <!-- Menu 4: Leaderboard -->
+            <li class="nav-item">
+                <a class="nav-link" href="#section-leaderboard" onclick="switchSection('leaderboard')">
+                    <i class="fas fa-fw fa-trophy"></i>
+                    <span>Papan Peringkat</span>
+                </a>
+            </li>
+
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle" aria-label="perkecil menu samping"></button>
+            </div>
+
+        </ul>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3" aria-label="buka menu">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Switcher Mode BISINDO / SIBI -->
+                    <div class="d-flex align-items-center">
+                        <span class="small font-weight-bold text-dark mr-2 d-none d-sm-inline">Bahasa Isyarat:</span>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Pilih mode bahasa isyarat">
+                            <button type="button" id="btn-mode-bisindo" class="btn btn-primary font-weight-bold active" onclick="setSignMode('BISINDO')">
+                                BISINDO
+                            </button>
+                            <button type="button" id="btn-mode-sibi" class="btn btn-outline-primary font-weight-bold" onclick="setSignMode('SIBI')">
+                                SIBI
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Topbar Navbar (Gamifikasi & Aksesibilitas) -->
+                    <ul class="navbar-nav ml-auto align-items-center">
+
+                        <!-- Tombol Aksesibilitas: High Contrast -->
+                        <li class="nav-item mx-1">
+                            <button id="btn-contrast" class="btn btn-sm btn-outline-dark" onclick="toggleHighContrast()" title="Mode Kontras Tinggi (Aksesibilitas)">
+                                <i class="fas fa-adjust"></i> <span class="d-none d-md-inline">Kontras</span>
+                            </button>
+                        </li>
+
+                        <!-- Indikator Daily Streak -->
+                        <li class="nav-item mx-2">
+                            <span class="badge badge-pill badge-warning px-3 py-2 text-dark font-weight-bold" title="Daily Streak">
+                                <i class="fas fa-fire text-danger mr-1"></i> <span id="user-streak">3</span> Hari
+                            </span>
+                        </li>
+
+                        <!-- Indikator Total XP -->
+                        <li class="nav-item mx-1">
+                            <span class="badge badge-pill badge-success px-3 py-2 font-weight-bold" title="Total Poin XP">
+                                <i class="fas fa-star mr-1"></i> <span id="user-xp">120</span> XP
+                            </span>
+                        </li>
+
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-dark font-weight-bold small" id="user-name">Pembelajar Inklusif</span>
+                                <img class="img-profile rounded-circle" src="img/undraw_profile.svg" alt="Foto Profil">
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="#" onclick="resetProgress()">
+                                    <i class="fas fa-redo fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Reset Progres Demo
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="login.html">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Keluar / Ganti Akun
+                                </a>
+                            </div>
+                        </li>
+
+                    </ul>
+                </nav>
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Banner Info Mode Aktif -->
+                    <div class="alert alert-info border-left-primary shadow-sm d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4" role="alert">
+                        <div>
+                            <h5 class="font-weight-bold mb-1 text-dark">
+                                Mode Aktif: <span id="active-mode-label" class="badge badge-primary">BISINDO</span>
+                            </h5>
+                            <p class="mb-0 small text-dark" id="active-mode-desc">
+                                <strong>BISINDO (Bahasa Isyarat Indonesia):</strong> Bahasa isyarat alami komunitas Tuli Indonesia (abjad 2 tangan & ekspresi wajah).
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 1: PETA BELAJAR (PATH) -->
+                    <div id="section-belajar">
+                        <div class="d-sm-flex align-items-center justify-content-between mb-3">
+                            <h1 class="h4 mb-0 text-dark font-weight-bold">Jalur Pembelajaran (Isyarat + GEDSI)</h1>
+                        </div>
+
+                        <div class="row">
+                            <!-- Bab 1 -->
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card chapter-card border-left-primary shadow h-100">
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge badge-primary">BAB 1</span>
+                                            <span class="small font-weight-bold text-success">+50 XP</span>
+                                        </div>
+                                        <h5 class="font-weight-bold text-dark">Fondasi Komunikasi & Budaya Tuli</h5>
+                                        <p class="small text-dark flex-grow-1">
+                                            Pelajari sapaan dasar, sopan santun, serta etika memanggil dan berinteraksi dengan teman Tuli.
+                                        </p>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between small font-weight-bold mb-1">
+                                                <span>Progres Bab</span>
+                                                <span id="prog-bab-1-text">0%</span>
+                                            </div>
+                                            <div class="progress progress-sm">
+                                                <div id="prog-bab-1-bar" class="progress-bar bg-primary" role="progressbar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-primary btn-block btn-lg font-weight-bold" onclick="startQuiz(1)">
+                                            <i class="fas fa-play mr-2"></i> Mulai Bab 1
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bab 2 -->
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card chapter-card border-left-success shadow h-100">
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge badge-success">BAB 2</span>
+                                            <span class="small font-weight-bold text-success">+60 XP</span>
+                                        </div>
+                                        <h5 class="font-weight-bold text-dark">Kesetaraan Gender & Ruang Inklusif</h5>
+                                        <p class="small text-dark flex-grow-1">
+                                            Kosakata profesi dan peran sosial, serta studi kasus mengatasi bias gender dan hambatan aksesibilitas.
+                                        </p>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between small font-weight-bold mb-1">
+                                                <span>Progres Bab</span>
+                                                <span id="prog-bab-2-text">0%</span>
+                                            </div>
+                                            <div class="progress progress-sm">
+                                                <div id="prog-bab-2-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-success btn-block btn-lg font-weight-bold" onclick="startQuiz(2)">
+                                            <i class="fas fa-play mr-2"></i> Mulai Bab 2
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bab 3 -->
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card chapter-card border-left-info shadow h-100">
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge badge-info">BAB 3</span>
+                                            <span class="small font-weight-bold text-success">+70 XP</span>
+                                        </div>
+                                        <h5 class="font-weight-bold text-dark">Situasi Darurat & Advokasi Sosial</h5>
+                                        <p class="small text-dark flex-grow-1">
+                                            Isyarat kondisi darurat, layanan publik, dan prinsip <em>"Tanya Dulu Sebelum Membantu"</em>.
+                                        </p>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between small font-weight-bold mb-1">
+                                                <span>Progres Bab</span>
+                                                <span id="prog-bab-3-text">0%</span>
+                                            </div>
+                                            <div class="progress progress-sm">
+                                                <div id="prog-bab-3-bar" class="progress-bar bg-info" role="progressbar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-info btn-block btn-lg font-weight-bold" onclick="startQuiz(3)">
+                                            <i class="fas fa-play mr-2"></i> Mulai Bab 3
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: POJOK GEDSI (Ringkasan Etika) -->
+                    <div id="section-gedsi" class="mt-3">
+                        <h2 class="h4 mb-3 text-dark font-weight-bold">Kartu Panduan Cepat GEDSI</h2>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="card shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h6 class="font-weight-bold text-primary"><i class="fas fa-comment-dots mr-1"></i> Gunakan Istilah "Tuli"</h6>
+                                        <p class="small text-dark mb-0">Gunakan kata <strong>Tuli</strong> (huruf kapital) untuk menghormati identitas budaya dan bahasa isyarat, hindari istilah medis seperti "tunarungu" atau "bisu".</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h6 class="font-weight-bold text-success"><i class="fas fa-hand-paper mr-1"></i> Tanya Sebelum Membantu</h6>
+                                        <p class="small text-dark mb-0">Jangan langsung memegang tangan teman netra atau mendorong kursi roda tanpa izin. Selalu tanyakan: <em>"Apakah ada yang bisa saya bantu?"</em></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h6 class="font-weight-bold text-info"><i class="fas fa-closed-captioning mr-1"></i> Aksesibilitas Konten</h6>
+                                        <p class="small text-dark mb-0">Pastikan setiap video presentasi memiliki takarir (<em>subtitle</em>) dan desain memakai kontras warna tinggi agar ramah bagi semua kalangan.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto text-dark">
+                        <span>Aplikasi Pembelajaran Bahasa Isyarat (BISINDO & SIBI) & Literasi GEDSI &copy; 2026</span>
+                    </div>
+                </div>
+            </footer>
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- MODAL KUIS INTERAKTIF (Gaya Duolingo) -->
+    <div class="modal fade" id="quizModal" tabindex="-1" role="dialog" aria-labelledby="quizModalTitle" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content border-0 shadow-lg">
+                <!-- Header Kuis + Progress Bar Soal -->
+                <div class="modal-header bg-light align-items-center">
+                    <div class="w-100 mr-3">
+                        <div class="d-flex justify-content-between small font-weight-bold mb-1">
+                            <span id="quizModalTitle">Bab 1 - Soal 1/3</span>
+                            <span id="quizModeBadge" class="badge badge-primary">BISINDO</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div id="quiz-progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 33%"></div>
+                        </div>
+                    </div>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Tutup Kuis">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <!-- Body Kuis -->
+                <div class="modal-body p-4">
+                    <!-- Area Video Isyarat (Muncul hanya jika tipe soal = 'video') -->
+                    <div id="quiz-video-container" class="text-center mb-3">
+                        <div class="video-frame mx-auto mb-2">
+                            <video id="sign-video-player" class="w-100 rounded" autoplay loop muted playsinline>
+                                <source id="sign-video-source" src="" type="video/mp4">
+                                Browser kamu tidak mendukung pemutar video.
+                            </video>
+                        </div>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Kontrol kecepatan video">
+                            <button type="button" id="btn-speed-normal" class="btn btn-secondary active" onclick="setVideoSpeed(1.0)">
+                                <i class="fas fa-play mr-1"></i> Normal (1x)
+                            </button>
+                            <button type="button" id="btn-speed-slow" class="btn btn-outline-secondary" onclick="setVideoSpeed(0.5)">
+                                <i class="fas fa-turtle mr-1"></i> Lambat (0.5x)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pertanyaan / Studi Kasus -->
+                    <h5 id="quiz-question-text" class="font-weight-bold text-dark mb-3">Pertanyaan akan muncul di sini...</h5>
+
+                    <!-- Pilihan Jawaban -->
+                    <div id="quiz-options-container">
+                        <!-- Tombol opsi dirender otomatis oleh JS -->
+                    </div>
+
+                    <!-- Kotak Umpan Balik / Penjelasan GEDSI -->
+                    <div id="quiz-feedback" class="alert mt-3 d-none" role="alert">
+                        <h6 id="feedback-title" class="font-weight-bold mb-1"></h6>
+                        <p id="feedback-explanation" class="mb-0 small"></p>
+                    </div>
+                </div>
+
+                <!-- Footer Kuis -->
+                <div class="modal-footer bg-light">
+                    <button type="button" id="btn-next-question" class="btn btn-primary btn-lg px-4 font-weight-bold d-none" onclick="nextQuestion()">
+                        Lanjut <i class="fas fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript (Bawaan SB Admin 2) -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="js/sb-admin-2.min.js"></script>
+
+    <!-- Script Utama Aplikasi Belajar Isyarat & GEDSI -->
+    <script src="js/app-learning.js"></script>
+
+</body>
+</html>
