@@ -187,6 +187,42 @@
                     </div>
                 </div>
             </div>
+
+            <!-- DAFTAR & HAPUS SOAL KUIS -->
+            <div class="card shadow border-0 mt-4">
+                <div class="card-header bg-success text-white font-weight-bold d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-tasks mr-2"></i> Kelola Daftar Soal Kuis (Per Bab)</span>
+                    <div class="d-flex align-items-center">
+                        <select id="filter-admin-quiz-bab" class="custom-select custom-select-sm mr-2" onchange="renderAdminQuizTable()">
+                            <option value="ALL">Semua Bab</option>
+                            <option value="1">Bab 1</option>
+                            <option value="2">Bab 2</option>
+                            <option value="3">Bab 3</option>
+                        </select>
+                        <button class="btn btn-sm btn-outline-light" onclick="loadAdminQuizList()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover table-sm mb-0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th style="width: 70px;" class="text-center">Bab</th>
+                                    <th style="width: 90px;" class="text-center">Tipe</th>
+                                    <th>Pertanyaan / Studi Kasus</th>
+                                    <th>Jawaban Benar</th>
+                                    <th style="width: 110px;" class="text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-quiz-table-body">
+                                <tr><td colspan="5" class="text-center">Memuat daftar soal kuis...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -194,6 +230,7 @@
     <script src="js/supabase-client.js"></script>
     <script>
         let cachedDictList = [];
+        let cachedQuizList = [];
 
         // Cek apakah user yang masuk benar-benar Admin
         document.addEventListener("DOMContentLoaded", async () => {
@@ -219,6 +256,7 @@
             // Lolos verifikasi Admin
             document.getElementById("admin-workspace").classList.remove("d-none");
             await loadAdminDictionaryList();
+            await loadAdminQuizList();
         });
 
         function toggleQuizVideoFields() {
@@ -332,6 +370,87 @@
             }
         }
 
+        // Muat daftar soal kuis dari tabel 'questions'
+        async function loadAdminQuizList() {
+            const tbody = document.getElementById("admin-quiz-table-body");
+            const { data, error } = await supabaseClient
+                .from("questions")
+                .select("*")
+                .order("chapter_id", { ascending: true })
+                .order("id", { ascending: false });
+
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Gagal memuat soal: ${error.message}</td></tr>`;
+                return;
+            }
+
+            cachedQuizList = data || [];
+            renderAdminQuizTable();
+        }
+
+        function renderAdminQuizTable() {
+            const tbody = document.getElementById("admin-quiz-table-body");
+            const filterBab = document.getElementById("filter-admin-quiz-bab")?.value || "ALL";
+
+            const filtered = cachedQuizList.filter(q => filterBab === "ALL" || String(q.chapter_id) === filterBab);
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center">Belum ada soal kuis untuk filter ini.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(q => {
+                const typeBadge = q.type === "video"
+                    ? `<span class="badge badge-primary"><i class="fas fa-video mr-1"></i>Video</span>`
+                    : `<span class="badge badge-info">GEDSI</span>`;
+                const correctText = Array.isArray(q.options) ? (q.options[q.correct_index] || "-") : "-";
+
+                return `
+                    <tr>
+                        <td class="text-center font-weight-bold align-middle">Bab ${q.chapter_id}</td>
+                        <td class="text-center align-middle">${typeBadge}</td>
+                        <td class="small text-dark align-middle">${q.question}</td>
+                        <td class="small text-success font-weight-bold align-middle">${correctText}</td>
+                        <td class="text-center align-middle">
+                            <button class="btn btn-danger btn-sm font-weight-bold" onclick="deleteQuizItem(${q.id})">
+                                <i class="fas fa-trash-alt mr-1"></i> Hapus
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join("");
+        }
+
+        // Hapus soal kuis beserta file videonya di Storage (jika tipe video)
+        async function deleteQuizItem(id) {
+            const item = cachedQuizList.find(q => q.id === id);
+            if (!item) return;
+
+            if (!confirm(`Yakin ingin menghapus soal dari Bab ${item.chapter_id} ini?`)) return;
+
+            try {
+                const pathsToRemove = [
+                    extractStoragePath(item.video_bisindo),
+                    extractStoragePath(item.video_sibi)
+                ].filter(Boolean);
+
+                if (pathsToRemove.length > 0) {
+                    await supabaseClient.storage.from('sign-videos').remove(pathsToRemove);
+                }
+
+                const { error } = await supabaseClient
+                    .from("questions")
+                    .delete()
+                    .eq("id", id);
+
+                if (error) throw error;
+
+                await loadAdminQuizList();
+            } catch (err) {
+                alert("Gagal menghapus soal: " + err.message);
+            }
+        }
+
         // Submit Form Kamus
         document.getElementById("form-dictionary").addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -408,6 +527,7 @@
                 alert("Soal kuis baru berhasil disimpan ke database!");
                 e.target.reset();
                 toggleQuizVideoFields();
+                await loadAdminQuizList ();
             } catch (err) {
                 alert("Error: " + err.message);
             } finally {
