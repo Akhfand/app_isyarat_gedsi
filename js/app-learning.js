@@ -3,6 +3,7 @@ let currentMode = 'BISINDO';
 let userXP = 0;
 let userStreak = 1;
 let completedChapters = {};
+let activeDictCategory = "ALL";
 
 let dictionaryData = [];
 let curriculumData = {};
@@ -38,8 +39,14 @@ async function checkUserSession() {
             userXP = profile.total_xp;
             userStreak = profile.streak_days;
             currentMode = profile.preferred_mode || 'BISINDO';
-        }
 
+            // Tampilkan menu Panel Admin jika role === 'admin'
+            if (profile.role === 'admin') {
+                userNameEl.innerHTML = `${profile.full_name} <span class="badge badge-danger ml-1">Admin</span>`;
+                const navAdmin = document.getElementById("nav-admin");
+                if (navAdmin) navAdmin.classList.remove("d-none");
+            }
+        }
         // Ambil riwayat bab yang sudah selesai
         const { data: progressRows } = await supabaseClient
             .from("user_progress")
@@ -66,6 +73,7 @@ async function loadAllDataFromSupabase() {
         .order("id", { ascending: true });
 
     if (dictRows) dictionaryData = dictRows;
+    renderCategoryFilters();
 
     // Ambil Bab & Soal
     const { data: chapters } = await supabaseClient.from("chapters").select("*").order("id");
@@ -146,21 +154,65 @@ function toggleHighContrast() {
 }
 
 // Render Kamus dari Data Supabase
+// Otomatis membuat tombol & dropdown kategori berdasarkan isi tabel 'dictionary' di Supabase
+function renderCategoryFilters() {
+    const selectEl = document.getElementById("kamus-category");
+    const pillsEl = document.getElementById("kamus-category-pills");
+    if (!selectEl || !pillsEl) return;
+
+    // Ambil daftar kategori unik dari database
+    const uniqueCategories = [...new Set(dictionaryData.map(item => item.kategori).filter(Boolean))];
+
+    if (activeDictCategory !== "ALL" && !uniqueCategories.includes(activeDictCategory)) {
+        activeDictCategory = "ALL";
+    }
+
+    // 1. Isi Dropdown <select>
+    selectEl.innerHTML = `<option value="ALL">Semua Kategori (${dictionaryData.length})</option>` +
+        uniqueCategories.map(cat => {
+            const count = dictionaryData.filter(d => d.kategori === cat).length;
+            return `<option value="${cat}" ${activeDictCategory === cat ? 'selected' : ''}>${cat} (${count})</option>`;
+        }).join("");
+
+    // 2. Isi Tombol Pill Kategori
+    const allBtnClass = activeDictCategory === "ALL" ? "btn-primary" : "btn-outline-primary";
+    let pillsHtml = `<button type="button" class="btn btn-sm ${allBtnClass} font-weight-bold mr-2 mb-2" onclick="setDictionaryCategory('ALL')">Semua (${dictionaryData.length})</button>`;
+
+    pillsHtml += uniqueCategories.map(cat => {
+        const count = dictionaryData.filter(d => d.kategori === cat).length;
+        const btnClass = activeDictCategory === cat ? "btn-primary" : "btn-outline-primary";
+        const safeCat = cat.replace(/'/g, "\\'");
+        return `<button type="button" class="btn btn-sm ${btnClass} font-weight-bold mr-2 mb-2" onclick="setDictionaryCategory('${safeCat}')">${cat} (${count})</button>`;
+    }).join("");
+
+    pillsEl.innerHTML = pillsHtml;
+}
+
+function setDictionaryCategory(category) {
+    activeDictCategory = category;
+    renderCategoryFilters();
+    renderDictionary();
+}
+
 function renderDictionary() {
     const grid = document.getElementById("kamus-grid");
     if (!grid) return;
 
     const keyword = (document.getElementById("kamus-search")?.value || "").toLowerCase();
-    const category = document.getElementById("kamus-category")?.value || "ALL";
 
     const filtered = dictionaryData.filter(item => {
         const matchWord = item.kata.toLowerCase().includes(keyword);
-        const matchCat = (category === "ALL" || item.kategori === category);
+        const matchCat = (activeDictCategory === "ALL" || item.kategori === activeDictCategory);
         return matchWord && matchCat;
     });
 
     if (filtered.length === 0) {
-        grid.innerHTML = `<div class="col-12"><div class="alert alert-warning text-center">Kosakata tidak ditemukan.</div></div>`;
+        grid.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-warning text-center">
+                    Kosakata tidak ditemukan pada kategori <strong>${activeDictCategory}</strong>.
+                </div>
+            </div>`;
         return;
     }
 

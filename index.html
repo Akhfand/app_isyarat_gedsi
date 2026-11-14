@@ -277,10 +277,10 @@
                             <h1 class="h4 mb-0 text-dark font-weight-bold">Kamus Video Isyarat (<span id="kamus-mode-title">BISINDO</span>)</h1>
                         </div>
 
-                        <!-- Filter & Pencarian Kamus -->
+                       <!-- Filter & Pencarian Kamus -->
                         <div class="card shadow-sm mb-4">
                             <div class="card-body">
-                                <div class="row">
+                                <div class="row align-items-center mb-3">
                                     <div class="col-md-8 mb-2 mb-md-0">
                                         <label for="kamus-search" class="sr-only">Cari Kosakata</label>
                                         <div class="input-group">
@@ -292,15 +292,14 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label for="kamus-category" class="sr-only">Filter Kategori</label>
-                                        <select id="kamus-category" class="custom-select" onchange="renderDictionary()">
+                                        <select id="kamus-category" class="custom-select" onchange="setDictionaryCategory(this.value)">
                                             <option value="ALL">Semua Kategori</option>
-                                            <option value="Sapaan">Sapaan & Perkenalan</option>
-                                            <option value="Sopan Santun">Sopan Santun</option>
-                                            <option value="Peran & Inklusi">Peran & Inklusi</option>
-                                            <option value="Darurat">Situasi Darurat</option>
                                         </select>
                                     </div>
                                 </div>
+
+                                <!-- Deretan Tombol Kategori (Otomatis terisi dari Supabase) -->
+                                <div id="kamus-category-pills" class="d-flex flex-wrap"></div>
                             </div>
                         </div>
 
@@ -408,7 +407,13 @@
                             </div>
                         </div>
                     </div>
-
+                    <!-- Menu 5: Kelola Materi (Khusus Admin) -->
+                    <li class="nav-item d-none" id="nav-admin">
+                        <a class="nav-link" href="admin.html">
+                            <i class="fas fa-fw fa-user-shield"></i>
+                            <span>Panel Admin Materi</span>
+                        </a>
+                    </li>
                 </div>
                 <!-- /.container-fluid -->
 

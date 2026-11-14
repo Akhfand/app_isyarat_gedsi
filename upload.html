@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Upload Video Isyarat - IsyaratInklusi</title>
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800" rel="stylesheet">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card shadow border-0">
+                    <div class="card-header bg-primary text-white font-weight-bold">
+                        <i class="fas fa-cloud-upload-alt mr-2"></i> Upload Video Isyarat (BISINDO / SIBI)
+                    </div>
+                    <div class="card-body p-4">
+                        <div id="auth-warning" class="alert alert-warning d-none">
+                            Kamu harus <a href="login.html" class="font-weight-bold">Login</a> terlebih dahulu untuk mengunggah video.
+                        </div>
+
+                        <form id="upload-form">
+                            <div class="form-group">
+                                <label class="font-weight-bold text-dark">Jenis Bahasa Isyarat</label>
+                                <select id="sign-type" class="custom-select" required>
+                                    <option value="bisindo">BISINDO</option>
+                                    <option value="sibi">SIBI</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="font-weight-bold text-dark">Nama Kosakata (contoh: terima_kasih)</label>
+                                <input type="text" id="word-name" class="form-control" placeholder="Gunakan huruf kecil tanpa spasi" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="font-weight-bold text-dark">Pilih File Video (.mp4)</label>
+                                <input type="file" id="video-file" class="form-control-file" accept="video/mp4,video/webm" required>
+                                <small class="text-muted">Disarankan durasi 3–5 detik, ukuran maksimal 5 MB.</small>
+                            </div>
+
+                            <button type="submit" id="btn-upload" class="btn btn-primary btn-block font-weight-bold">
+                                <i class="fas fa-upload mr-1"></i> Unggah ke Supabase
+                            </button>
+                        </form>
+
+                        <!-- Hasil URL setelah upload berhasil -->
+                        <div id="result-box" class="alert alert-success mt-4 d-none">
+                            <h6 class="font-weight-bold mb-1">Upload Berhasil!</h6>
+                            <p class="small mb-2">Salin URL di bawah ini untuk dimasukkan ke tabel database:</p>
+                            <div class="input-group input-group-sm">
+                                <input type="text" id="public-url-output" class="form-control" readonly>
+                                <div class="input-group-append">
+                                    <button class="btn btn-dark" type="button" onclick="copyUrl()">Salin</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+                        <a href="index.html" class="small font-weight-bold">&larr; Kembali ke Aplikasi Utama</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) {
+                document.getElementById("auth-warning").classList.remove("d-none");
+                document.getElementById("btn-upload").disabled = true;
+            }
+        });
+
+        document.getElementById("upload-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById("btn-upload");
+            const type = document.getElementById("sign-type").value;
+            const rawName = document.getElementById("word-name").value.trim().toLowerCase().replace(/\s+/g, '_');
+            const fileInput = document.getElementById("video-file");
+            const file = fileInput.files[0];
+
+            if (!file) return;
+
+            btn.disabled = true;
+            btn.innerText = "Mengunggah video...";
+
+            const fileExt = file.name.split('.').pop();
+            const filePath = `${type}/${rawName}_${Date.now()}.${fileExt}`;
+
+            const { error } = await supabaseClient.storage
+                .from('sign-videos')
+                .upload(filePath, file, { upsert: true });
+
+            if (error) {
+                alert("Gagal mengunggah: " + error.message);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-upload mr-1"></i> Unggah ke Supabase';
+                return;
+            }
+
+            const { data: urlData } = supabaseClient.storage
+                .from('sign-videos')
+                .getPublicUrl(filePath);
+
+            document.getElementById("public-url-output").value = urlData.publicUrl;
+            document.getElementById("result-box").classList.remove("d-none");
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-upload mr-1"></i> Unggah Video Lainnya';
+        });
+
+        function copyUrl() {
+            const copyText = document.getElementById("public-url-output");
+            copyText.select();
+            navigator.clipboard.writeText(copyText.value);
+            alert("URL video berhasil disalin!");
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Panel Admin Materi - IsyaratInklusi GEDSI</title>
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800" rel="stylesheet">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h4 font-weight-bold text-dark mb-0">Panel Admin Konten (BISINDO / SIBI / GEDSI)</h1>
+                <p class="small text-muted mb-0">Kelola kamus bahasa isyarat, unggah video, dan tambahkan soal kuis.</p>
+            </div>
+            <a href="index.html" class="btn btn-outline-primary btn-sm font-weight-bold">
+                <i class="fas fa-arrow-left mr-1"></i> Kembali ke Aplikasi
+            </a>
+        </div>
+
+        <!-- Peringatan Akses Ditolak (Muncul jika bukan Admin) -->
+        <div id="access-denied-box" class="alert alert-danger shadow-sm d-none">
+            <h5 class="font-weight-bold"><i class="fas fa-lock mr-2"></i> Akses Ditolak</h5>
+            <p class="mb-2" id="access-denied-msg">Halaman ini hanya dapat diakses oleh akun dengan hak akses <strong>Admin</strong>.</p>
+            <a href="login.html" class="btn btn-danger btn-sm font-weight-bold">Login dengan Akun Admin</a>
+            <a href="index.html" class="btn btn-secondary btn-sm">Kembali ke Beranda</a>
+        </div>
+
+        <!-- Konten Utama Admin (Hanya tampil setelah terverifikasi Admin) -->
+        <div id="admin-workspace" class="d-none">
+            <div class="row">
+                <!-- FORM 1: TAMBAH KOSAKATA KAMUS -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow border-0 h-100">
+                        <div class="card-header bg-primary text-white font-weight-bold">
+                            <i class="fas fa-book-open mr-2"></i> 1. Tambah Kosakata Kamus Isyarat
+                        </div>
+                        <div class="card-body">
+                            <form id="form-dictionary">
+                                <div class="form-row">
+                                    <div class="form-group col-md-7">
+                                        <label class="small font-weight-bold text-dark">Kata / Frasa</label>
+                                        <input type="text" id="dict-kata" class="form-control" placeholder="Contoh: Selamat Pagi" required>
+                                    </div>
+                                    <div class="form-group col-md-5">
+                                        <label class="small font-weight-bold text-dark">Kategori</label>
+                                        <input type="text" id="dict-kategori" class="form-control" placeholder="Contoh: Sapaan" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="small font-weight-bold text-primary">Video Peragaan BISINDO (.mp4) - Opsional</label>
+                                    <input type="file" id="dict-vid-bisindo" class="form-control-file small" accept="video/mp4,video/webm">
+                                </div>
+                                <div class="form-group">
+                                    <label class="small font-weight-bold text-dark">Panduan Gerakan BISINDO</label>
+                                    <textarea id="dict-desc-bisindo" class="form-control" rows="2" placeholder="Jelaskan bentuk tangan & ekspresi wajah..." required></textarea>
+                                </div>
+
+                                <hr>
+
+                                <div class="form-group">
+                                    <label class="small font-weight-bold text-success">Video Peragaan SIBI (.mp4) - Opsional</label>
+                                    <input type="file" id="dict-vid-sibi" class="form-control-file small" accept="video/mp4,video/webm">
+                                </div>
+                                <div class="form-group">
+                                    <label class="small font-weight-bold text-dark">Panduan Gerakan SIBI</label>
+                                    <textarea id="dict-desc-sibi" class="form-control" rows="2" placeholder="Jelaskan gerakan tangan versi SIBI..." required></textarea>
+                                </div>
+
+                                <button type="submit" id="btn-save-dict" class="btn btn-primary btn-block font-weight-bold">
+                                    <i class="fas fa-save mr-1"></i> Simpan ke Kamus
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FORM 2: TAMBAH SOAL KUIS -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow border-0 h-100">
+                        <div class="card-header bg-success text-white font-weight-bold">
+                            <i class="fas fa-question-circle mr-2"></i> 2. Tambah Soal Kuis (Video / Studi Kasus GEDSI)
+                        </div>
+                        <div class="card-body">
+                            <form id="form-quiz">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label class="small font-weight-bold text-dark">Pilih Bab</label>
+                                        <select id="quiz-chapter" class="custom-select" required>
+                                            <option value="1">Bab 1: Komunikasi & Budaya Tuli</option>
+                                            <option value="2">Bab 2: Kesetaraan Gender & Inklusi</option>
+                                            <option value="3">Bab 3: Darurat & Advokasi Sosial</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="small font-weight-bold text-dark">Tipe Soal</label>
+                                        <select id="quiz-type" class="custom-select" onchange="toggleQuizVideoFields()" required>
+                                            <option value="gedsi">Studi Kasus GEDSI (Teks)</option>
+                                            <option value="video">Tebak Video Isyarat</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Input Video (Muncul jika tipe soal = video) -->
+                                <div id="quiz-video-inputs" class="p-3 bg-light rounded border mb-3 d-none">
+                                    <div class="form-group mb-2">
+                                        <label class="small font-weight-bold text-primary">Video Soal BISINDO (.mp4)</label>
+                                        <input type="file" id="quiz-vid-bisindo" class="form-control-file small" accept="video/mp4,video/webm">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="small font-weight-bold text-success">Video Soal SIBI (.mp4)</label>
+                                        <input type="file" id="quiz-vid-sibi" class="form-control-file small" accept="video/mp4,video/webm">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="small font-weight-bold text-dark">Pertanyaan / Narasi Kasus</label>
+                                    <textarea id="quiz-question" class="form-control" rows="2" placeholder="Tulis pertanyaan kuis..." required></textarea>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label class="small font-weight-bold text-dark">Pilihan A (Index 0)</label>
+                                        <input type="text" id="opt-0" class="form-control form-control-sm" required>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="small font-weight-bold text-dark">Pilihan B (Index 1)</label>
+                                        <input type="text" id="opt-1" class="form-control form-control-sm" required>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="small font-weight-bold text-dark">Pilihan C (Index 2)</label>
+                                        <input type="text" id="opt-2" class="form-control form-control-sm" required>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="small font-weight-bold text-success">Jawaban Benar</label>
+                                        <select id="quiz-correct" class="custom-select custom-select-sm" required>
+                                            <option value="0">Pilihan A</option>
+                                            <option value="1">Pilihan B</option>
+                                            <option value="2">Pilihan C</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="small font-weight-bold text-dark">Penjelasan Umpan Balik</label>
+                                    <textarea id="quiz-explanation" class="form-control" rows="2" placeholder="Jelaskan alasan jawaban tersebut benar..." required></textarea>
+                                </div>
+
+                                <button type="submit" id="btn-save-quiz" class="btn btn-success btn-block font-weight-bold">
+                                    <i class="fas fa-plus-circle mr-1"></i> Simpan Soal Kuis
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DAFTAR & HAPUS KOSAKATA KAMUS -->
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white font-weight-bold d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-list mr-2"></i> Kelola Daftar Kosakata Kamus</span>
+                    <button class="btn btn-sm btn-outline-light" onclick="loadAdminDictionaryList()">
+                        <i class="fas fa-sync-alt"></i> Segarkan
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover table-sm mb-0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th style="width: 50px;" class="text-center">No</th>
+                                    <th>Kata / Frasa</th>
+                                    <th>Kategori</th>
+                                    <th class="text-center">Video BISINDO</th>
+                                    <th class="text-center">Video SIBI</th>
+                                    <th style="width: 110px;" class="text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-dict-table-body">
+                                <tr><td colspan="6" class="text-center">Memuat data kamus...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script>
+        let cachedDictList = [];
+
+        // Cek apakah user yang masuk benar-benar Admin
+        document.addEventListener("DOMContentLoaded", async () => {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) {
+                document.getElementById("access-denied-msg").innerText = "Kamu belum login. Silakan masuk menggunakan akun Admin terlebih dahulu.";
+                document.getElementById("access-denied-box").classList.remove("d-none");
+                return;
+            }
+
+            const { data: profile } = await supabaseClient
+                .from("profiles")
+                .select("role")
+                .eq("id", user.id)
+                .single();
+
+            if (!profile || profile.role !== "admin") {
+                document.getElementById("access-denied-msg").innerText = "Akun kamu terdaftar sebagai Pengguna Biasa (bukan Admin), sehingga tidak memiliki izin mengelola materi.";
+                document.getElementById("access-denied-box").classList.remove("d-none");
+                return;
+            }
+
+            // Lolos verifikasi Admin
+            document.getElementById("admin-workspace").classList.remove("d-none");
+            await loadAdminDictionaryList();
+        });
+
+        function toggleQuizVideoFields() {
+            const type = document.getElementById("quiz-type").value;
+            const box = document.getElementById("quiz-video-inputs");
+            if (type === "video") box.classList.remove("d-none");
+            else box.classList.add("d-none");
+        }
+
+        // Helper upload video ke bucket 'sign-videos'
+        async function uploadVideoIfPresent(fileInputId, folder, slugName) {
+            const input = document.getElementById(fileInputId);
+            if (!input || !input.files || input.files.length === 0) return null;
+
+            const file = input.files[0];
+            const ext = file.name.split('.').pop();
+            const filePath = `${folder}/${slugName}_${Date.now()}.${ext}`;
+
+            const { error } = await supabaseClient.storage
+                .from('sign-videos')
+                .upload(filePath, file, { upsert: false });
+
+            if (error) throw new Error("Gagal upload video: " + error.message);
+
+            const { data } = supabaseClient.storage
+                .from('sign-videos')
+                .getPublicUrl(filePath);
+
+            return data.publicUrl;
+        }
+
+        // Muat daftar kamus di tabel bawah untuk manajemen & hapus
+        async function loadAdminDictionaryList() {
+            const tbody = document.getElementById("admin-dict-table-body");
+            const { data, error } = await supabaseClient
+                .from("dictionary")
+                .select("*")
+                .order("id", { ascending: false });
+
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Gagal memuat data: ${error.message}</td></tr>`;
+                return;
+            }
+
+            cachedDictList = data || [];
+            if (cachedDictList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center">Belum ada kosakata di kamus.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = cachedDictList.map((item, idx) => {
+                const hasBisindo = item.video_bisindo && item.video_bisindo.startsWith("http")
+                    ? `<span class="badge badge-success">Tersedia</span>`
+                    : `<span class="badge badge-secondary">Teks Saja</span>`;
+                const hasSibi = item.video_sibi && item.video_sibi.startsWith("http")
+                    ? `<span class="badge badge-success">Tersedia</span>`
+                    : `<span class="badge badge-secondary">Teks Saja</span>`;
+
+                return `
+                    <tr>
+                        <td class="text-center align-middle">${idx + 1}</td>
+                        <td class="font-weight-bold text-dark align-middle">${item.kata}</td>
+                        <td class="align-middle"><span class="badge badge-light border">${item.kategori}</span></td>
+                        <td class="text-center align-middle">${hasBisindo}</td>
+                        <td class="text-center align-middle">${hasSibi}</td>
+                        <td class="text-center align-middle">
+                            <button class="btn btn-danger btn-sm font-weight-bold" onclick="deleteDictionaryItem(${item.id})">
+                                <i class="fas fa-trash-alt mr-1"></i> Hapus
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join("");
+        }
+
+        // Ekstrak path file Storage dari URL publik Supabase
+        function extractStoragePath(publicUrl) {
+            if (!publicUrl || !publicUrl.includes('/sign-videos/')) return null;
+            return decodeURIComponent(publicUrl.split('/sign-videos/')[1]);
+        }
+
+        // Hapus item kamus beserta file videonya di Storage
+        async function deleteDictionaryItem(id) {
+            const item = cachedDictList.find(d => d.id === id);
+            if (!item) return;
+
+            if (!confirm(`Yakin ingin menghapus kosakata "${item.kata}" dari kamus?`)) return;
+
+            try {
+                // 1. Hapus file video dari bucket Storage jika ada
+                const pathsToRemove = [
+                    extractStoragePath(item.video_bisindo),
+                    extractStoragePath(item.video_sibi)
+                ].filter(Boolean);
+
+                if (pathsToRemove.length > 0) {
+                    await supabaseClient.storage.from('sign-videos').remove(pathsToRemove);
+                }
+
+                // 2. Hapus baris data dari tabel dictionary
+                const { error } = await supabaseClient
+                    .from("dictionary")
+                    .delete()
+                    .eq("id", id);
+
+                if (error) throw error;
+
+                await loadAdminDictionaryList();
+            } catch (err) {
+                alert("Gagal menghapus kosakata: " + err.message);
+            }
+        }
+
+        // Submit Form Kamus
+        document.getElementById("form-dictionary").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById("btn-save-dict");
+            btn.disabled = true;
+            btn.innerText = "Menyimpan...";
+
+            try {
+                const kata = document.getElementById("dict-kata").value.trim();
+                const kategori = document.getElementById("dict-kategori").value.trim();
+                const slug = kata.toLowerCase().replace(/\s+/g, '_');
+
+                const urlBisindo = await uploadVideoIfPresent("dict-vid-bisindo", "bisindo", slug);
+                const urlSibi = await uploadVideoIfPresent("dict-vid-sibi", "sibi", slug);
+
+                const { error } = await supabaseClient.from("dictionary").insert({
+                    kata: kata,
+                    kategori: kategori,
+                    video_bisindo: urlBisindo,
+                    video_sibi: urlSibi,
+                    desc_bisindo: document.getElementById("dict-desc-bisindo").value.trim(),
+                    desc_sibi: document.getElementById("dict-desc-sibi").value.trim()
+                });
+
+                if (error) throw error;
+
+                e.target.reset();
+                await loadAdminDictionaryList();
+            } catch (err) {
+                alert("Error: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save mr-1"></i> Simpan ke Kamus';
+            }
+        });
+
+        // Submit Form Kuis
+        document.getElementById("form-quiz").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById("btn-save-quiz");
+            btn.disabled = true;
+            btn.innerText = "Menyimpan...";
+
+            try {
+                const chapterId = parseInt(document.getElementById("quiz-chapter").value);
+                const type = document.getElementById("quiz-type").value;
+                let urlBisindo = null;
+                let urlSibi = null;
+
+                if (type === "video") {
+                    urlBisindo = await uploadVideoIfPresent("quiz-vid-bisindo", "bisindo", `quiz_bab${chapterId}`);
+                    urlSibi = await uploadVideoIfPresent("quiz-vid-sibi", "sibi", `quiz_bab${chapterId}`);
+                }
+
+                const optionsArray = [
+                    document.getElementById("opt-0").value.trim(),
+                    document.getElementById("opt-1").value.trim(),
+                    document.getElementById("opt-2").value.trim()
+                ];
+
+                const { error } = await supabaseClient.from("questions").insert({
+                    chapter_id: chapterId,
+                    type: type,
+                    video_bisindo: urlBisindo,
+                    video_sibi: urlSibi,
+                    question: document.getElementById("quiz-question").value.trim(),
+                    options: optionsArray,
+                    correct_index: parseInt(document.getElementById("quiz-correct").value),
+                    explanation: document.getElementById("quiz-explanation").value.trim()
+                });
+
+                if (error) throw error;
+
+                alert("Soal kuis baru berhasil disimpan ke database!");
+                e.target.reset();
+                toggleQuizVideoFields();
+            } catch (err) {
+                alert("Error: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-plus-circle mr-1"></i> Simpan Soal Kuis';
+            }
+        });
+    </script>
+</body>
+</html>
