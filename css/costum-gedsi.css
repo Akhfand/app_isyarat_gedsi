@@ -87,3 +87,19 @@ body.high-contrast .quiz-option-btn {
     color: #ffdd00 !important;
     border: 2px solid #ffdd00 !important;
 }
+
+/* Penyesuaian Tabel & Input pada Mode Kontras Tinggi */
+body.high-contrast .table,
+body.high-contrast .table td,
+body.high-contrast .table th,
+body.high-contrast .form-control,
+body.high-contrast .custom-select {
+    background-color: #121212 !important;
+    color: #ffffff !important;
+    border-color: #ffdd00 !important;
+}
+
+body.high-contrast .table-primary {
+    background-color: #2b2600 !important;
+    color: #ffdd00 !important;
+}

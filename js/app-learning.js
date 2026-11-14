@@ -8,7 +8,83 @@ let activeChapterId = 1;
 let currentQuestionIndex = 0;
 let chapterScore = 0;
 
-// Bank Materi & Soal (Nanti bisa ditarik langsung dari Database Supabase)
+// 1. Bank Data Kamus Isyarat (BISINDO & SIBI)
+const dictionaryData = [
+    {
+        id: "d1",
+        kata: "Halo",
+        kategori: "Sapaan",
+        videoBisindo: "assets/video/bisindo/halo.mp4",
+        videoSibi: "assets/video/sibi/halo.mp4",
+        descBisindo: "Angkat telapak tangan terbuka di samping kepala dengan ekspresi ramah, lalu lambaikan ringan ke arah lawan bicara.",
+        descSibi: "Posisikan tangan kanan terbuka di dekat pelipis seperti hormat ringan lalu gerakkan menjauh ke depan."
+    },
+    {
+        id: "d2",
+        kata: "Terima Kasih",
+        kategori: "Sopan Santun",
+        videoBisindo: "assets/video/bisindo/terima_kasih.mp4",
+        videoSibi: "assets/video/sibi/terima_kasih.mp4",
+        descBisindo: "Sentuh dagu dengan ujung jari telapak tangan terbuka, lalu gerakkan ke depan bawah ke arah lawan bicara.",
+        descSibi: "Ujung jari menyentuh bibir/dagu lalu digerakkan mendatar ke depan dengan telapak menghadap ke atas."
+    },
+    {
+        id: "d3",
+        kata: "Sama-sama",
+        kategori: "Sopan Santun",
+        videoBisindo: "assets/video/bisindo/sama_sama.mp4",
+        videoSibi: "assets/video/sibi/sama_sama.mp4",
+        descBisindo: "Arahkan kedua jari telunjuk sejajar ke depan lalu gerakkan sedikit maju-mundur secara bersamaan.",
+        descSibi: "Tangan membentuk huruf 'Y' (ibu jari dan kelingking terbuka), digerakkan menyamping bergantian."
+    },
+    {
+        id: "d4",
+        kata: "Maaf",
+        kategori: "Sopan Santun",
+        videoBisindo: "assets/video/bisindo/maaf.mp4",
+        videoSibi: "assets/video/sibi/maaf.mp4",
+        descBisindo: "Tempelkan telapak tangan di dada dengan ekspresi menyesal, lalu usap memutar perlahan.",
+        descSibi: "Tangan mengepal (huruf 'A' SIBI) ditempelkan di tengah dada lalu diputar searah jarum jam."
+    },
+    {
+        id: "d5",
+        kata: "Tolong / Bantuan",
+        kategori: "Darurat",
+        videoBisindo: "assets/video/bisindo/tolong.mp4",
+        videoSibi: "assets/video/sibi/tolong.mp4",
+        descBisindo: "Telapak tangan kiri terbuka ke atas, kepalan tangan kanan diletakkan di atasnya lalu diangkat bersama ke atas.",
+        descSibi: "Tangan kanan mengepal dengan ibu jari teracung di atas telapak tangan kiri, lalu diangkat ke atas."
+    },
+    {
+        id: "d6",
+        kata: "Setara / Adil",
+        kategori: "Peran & Inklusi",
+        videoBisindo: "assets/video/bisindo/setara.mp4",
+        videoSibi: "assets/video/sibi/setara.mp4",
+        descBisindo: "Kedua telapak tangan terbuka menghadap ke bawah pada ketinggian sejajar di depan dada.",
+        descSibi: "Kedua tangan membentuk posisi sejajar seimbang di depan tubuh seperti timbangan rata."
+    },
+    {
+        id: "d7",
+        kata: "Mahasiswa",
+        kategori: "Peran & Inklusi",
+        videoBisindo: "assets/video/bisindo/mahasiswa.mp4",
+        videoSibi: "assets/video/sibi/mahasiswa.mp4",
+        descBisindo: "Peragakan gerakan mengambil ilmu dari telapak tangan lalu menyentuh pelipis/dahi.",
+        descSibi: "Isyarat kata 'belajar' diikuti posisi tangan membentuk tanda tingkat pendidikan tinggi."
+    },
+    {
+        id: "d8",
+        kata: "Sakit / Bahaya",
+        kategori: "Darurat",
+        videoBisindo: "assets/video/bisindo/sakit.mp4",
+        videoSibi: "assets/video/sibi/sakit.mp4",
+        descBisindo: "Arahkan kedua jari telunjuk saling berhadapan di depan area tubuh yang sakit dengan mimik meringis.",
+        descSibi: "Kedua jari tengah ditekuk sedikit dan digerakkan mendekat-menjauh di depan dada."
+    }
+];
+
+// 2. Bank Materi & Soal Kuis Bab 1-3
 const curriculumData = {
     1: {
         title: "Bab 1: Fondasi Komunikasi & Budaya Tuli",
@@ -96,7 +172,26 @@ const curriculumData = {
 document.addEventListener("DOMContentLoaded", () => {
     updateTopbarUI();
     setSignMode(currentMode);
+    renderDictionary();
+    renderLeaderboard();
 });
+
+// Navigasi Antar Halaman (Sidebar)
+function switchSection(sectionName) {
+    // Sembunyikan semua section
+    document.querySelectorAll(".app-section").forEach(sec => sec.classList.add("d-none"));
+    // Tampilkan section yang dipilih
+    const target = document.getElementById(`section-${sectionName}`);
+    if (target) target.classList.remove("d-none");
+
+    // Update highlight menu aktif di sidebar
+    document.querySelectorAll("#accordionSidebar .nav-item").forEach(item => item.classList.remove("active"));
+    const activeNav = document.getElementById(`nav-${sectionName}`);
+    if (activeNav) activeNav.classList.add("active");
+
+    if (sectionName === "kamus") renderDictionary();
+    if (sectionName === "leaderboard") renderLeaderboard();
+}
 
 function updateTopbarUI() {
     document.getElementById("user-xp").innerText = userXP;
@@ -118,6 +213,9 @@ function setSignMode(mode) {
     const btnSibi = document.getElementById("btn-mode-sibi");
     const label = document.getElementById("active-mode-label");
     const desc = document.getElementById("active-mode-desc");
+    const kamusTitle = document.getElementById("kamus-mode-title");
+
+    if (kamusTitle) kamusTitle.innerText = mode;
 
     if (mode === 'BISINDO') {
         btnBisindo.className = "btn btn-primary font-weight-bold active";
@@ -130,6 +228,9 @@ function setSignMode(mode) {
         label.innerText = "SIBI";
         desc.innerHTML = "<strong>SIBI (Sistem Isyarat Bahasa Indonesia):</strong> Sistem isyarat baku sesuai tata bahasa Indonesia (abjad 1 tangan & memakai imbuhan).";
     }
+
+    renderDictionary();
+    renderLeaderboard();
 }
 
 // Toggle Mode Kontras Tinggi (GEDSI Accessibility)
@@ -137,7 +238,120 @@ function toggleHighContrast() {
     document.body.classList.toggle("high-contrast");
 }
 
-// Mulai Kuis Bab Tertentu
+// =========================================================
+// LOGIKA KAMUS ISYARAT
+// =========================================================
+function renderDictionary() {
+    const grid = document.getElementById("kamus-grid");
+    if (!grid) return;
+
+    const keyword = (document.getElementById("kamus-search")?.value || "").toLowerCase();
+    const category = document.getElementById("kamus-category")?.value || "ALL";
+
+    const filtered = dictionaryData.filter(item => {
+        const matchWord = item.kata.toLowerCase().includes(keyword);
+        const matchCat = (category === "ALL" || item.kategori === category);
+        return matchWord && matchCat;
+    });
+
+    if (filtered.length === 0) {
+        grid.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-warning text-center">
+                    Kosakata "<strong>${keyword}</strong>" tidak ditemukan pada kategori ini.
+                </div>
+            </div>`;
+        return;
+    }
+
+    grid.innerHTML = filtered.map(item => {
+        const movementDesc = (currentMode === 'BISINDO') ? item.descBisindo : item.descSibi;
+        return `
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                <div class="card chapter-card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge badge-light border text-dark">${item.kategori}</span>
+                            <span class="badge badge-primary">${currentMode}</span>
+                        </div>
+                        <h5 class="font-weight-bold text-dark mb-2">${item.kata}</h5>
+                        <p class="small text-dark flex-grow-1">${movementDesc}</p>
+                        <button class="btn btn-outline-primary btn-block font-weight-bold mt-2" onclick="openDictModal('${item.id}')">
+                            <i class="fas fa-video mr-1"></i> Putar Video Isyarat
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+function openDictModal(dictId) {
+    const item = dictionaryData.find(d => d.id === dictId);
+    if (!item) return;
+
+    document.getElementById("dictModalTitle").innerText = `Isyarat: "${item.kata}"`;
+    document.getElementById("dictModalModeBadge").innerText = currentMode;
+    document.getElementById("dictModalDesc").innerText = (currentMode === 'BISINDO') ? item.descBisindo : item.descSibi;
+
+    const videoPlayer = document.getElementById("dict-video-player");
+    const videoSource = document.getElementById("dict-video-source");
+    videoSource.src = (currentMode === 'BISINDO') ? item.videoBisindo : item.videoSibi;
+    videoPlayer.load();
+    setDictVideoSpeed(1.0);
+
+    $('#dictVideoModal').modal('show');
+}
+
+function setDictVideoSpeed(rate) {
+    const video = document.getElementById("dict-video-player");
+    video.playbackRate = rate;
+    document.getElementById("dict-speed-normal").className = (rate === 1.0) ? "btn btn-secondary active" : "btn btn-outline-secondary";
+    document.getElementById("dict-speed-slow").className = (rate === 0.5) ? "btn btn-secondary active" : "btn btn-outline-secondary";
+}
+
+// =========================================================
+// LOGIKA LEADERBOARD (PAPAN PERINGKAT)
+// =========================================================
+function renderLeaderboard() {
+    const tbody = document.getElementById("leaderboard-body");
+    if (!tbody) return;
+
+    const players = [
+        { name: "Rina Maharani", mode: "BISINDO", streak: 7, xp: 340, isMe: false },
+        { name: "Dimas Pratama", mode: "SIBI", streak: 5, xp: 250, isMe: false },
+        { name: "Siti Aisyah", mode: "BISINDO", streak: 4, xp: 180, isMe: false },
+        { name: "Pembelajar Inklusif (Kamu)", mode: currentMode, streak: userStreak, xp: userXP, isMe: true },
+        { name: "Budi Santoso", mode: "SIBI", streak: 1, xp: 90, isMe: false }
+    ];
+
+    // Urutkan dari XP tertinggi
+    players.sort((a, b) => b.xp - a.xp);
+
+    tbody.innerHTML = players.map((p, index) => {
+        const rank = index + 1;
+        let rankBadge = `<span class="font-weight-bold">#${rank}</span>`;
+        if (rank === 1) rankBadge = `<span class="badge badge-warning text-dark px-2 py-1"><i class="fas fa-crown mr-1"></i>#1</span>`;
+        if (rank === 2) rankBadge = `<span class="badge badge-secondary px-2 py-1">#2</span>`;
+        if (rank === 3) rankBadge = `<span class="badge badge-info px-2 py-1">#3</span>`;
+
+        const rowClass = p.isMe ? "table-primary font-weight-bold text-dark" : "text-dark";
+
+        return `
+            <tr class="${rowClass}">
+                <td class="text-center">${rankBadge}</td>
+                <td>${p.name}</td>
+                <td><span class="badge badge-light border text-dark">${p.mode}</span></td>
+                <td class="text-center"><i class="fas fa-fire text-danger mr-1"></i>${p.streak} Hari</td>
+                <td class="text-right font-weight-bold text-success">${p.xp} XP</td>
+            </tr>
+        `;
+    }).join("");
+}
+
+// =========================================================
+// LOGIKA KUIS INTERAKTIF
+// =========================================================
 function startQuiz(chapterId) {
     activeChapterId = chapterId;
     currentQuestionIndex = 0;
@@ -151,13 +365,11 @@ function renderQuestion() {
     const q = chapter.questions[currentQuestionIndex];
     const totalQ = chapter.questions.length;
 
-    // Update Header & Progress Bar
     document.getElementById("quizModalTitle").innerText = `${chapter.title} (${currentQuestionIndex + 1}/${totalQ})`;
     document.getElementById("quizModeBadge").innerText = currentMode;
     const progressPct = Math.round(((currentQuestionIndex) / totalQ) * 100);
     document.getElementById("quiz-progress-bar").style.width = progressPct + "%";
 
-    // Tampilkan / Sembunyikan Pemutar Video
     const videoContainer = document.getElementById("quiz-video-container");
     const videoPlayer = document.getElementById("sign-video-player");
     const videoSource = document.getElementById("sign-video-source");
@@ -172,7 +384,6 @@ function renderQuestion() {
         videoPlayer.pause();
     }
 
-    // Render Pertanyaan & Opsi Jawaban
     document.getElementById("quiz-question-text").innerText = q.question;
     const optionsContainer = document.getElementById("quiz-options-container");
     optionsContainer.innerHTML = "";
@@ -186,7 +397,6 @@ function renderQuestion() {
         optionsContainer.appendChild(btn);
     });
 
-    // Reset Feedback & Tombol Lanjut
     document.getElementById("quiz-feedback").classList.add("d-none");
     document.getElementById("btn-next-question").classList.add("d-none");
 }
@@ -203,7 +413,6 @@ function checkAnswer(selectedIndex, clickedBtn) {
     const q = curriculumData[activeChapterId].questions[currentQuestionIndex];
     const allBtns = document.querySelectorAll(".quiz-option-btn");
 
-    // Nonaktifkan semua tombol setelah memilih
     allBtns.forEach((b, idx) => {
         b.disabled = true;
         if (idx === q.correctIndex) b.classList.add("correct");
@@ -236,7 +445,6 @@ function nextQuestion() {
     if (currentQuestionIndex < chapter.questions.length) {
         renderQuestion();
     } else {
-        // Selesai Bab
         document.getElementById("quiz-progress-bar").style.width = "100%";
         userXP += chapter.xpReward;
         completedChapters[activeChapterId] = true;
@@ -245,6 +453,7 @@ function nextQuestion() {
         localStorage.setItem('completedChapters', JSON.stringify(completedChapters));
 
         updateTopbarUI();
+        renderLeaderboard();
         $('#quizModal').modal('hide');
         alert(`Selamat! Kamu menyelesaikan ${chapter.title} dan mendapatkan +${chapter.xpReward} XP!`);
     }
@@ -256,4 +465,5 @@ function resetProgress() {
     userStreak = 1;
     completedChapters = {};
     updateTopbarUI();
+    renderLeaderboard();
 }

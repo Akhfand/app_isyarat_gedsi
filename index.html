@@ -27,7 +27,7 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#" onclick="switchSection('belajar'); return false;">
                 <div class="sidebar-brand-icon">
                     <i class="fas fa-hands"></i>
                 </div>
@@ -37,8 +37,8 @@
             <hr class="sidebar-divider my-0">
 
             <!-- Menu 1: Peta Belajar -->
-            <li class="nav-item active">
-                <a class="nav-link" href="#section-belajar" onclick="switchSection('belajar')">
+            <li class="nav-item active" id="nav-belajar">
+                <a class="nav-link" href="#belajar" onclick="switchSection('belajar'); return false;">
                     <i class="fas fa-fw fa-map-signs"></i>
                     <span>Peta Belajar</span>
                 </a>
@@ -49,24 +49,24 @@
             <div class="sidebar-heading">Eksplorasi & Inklusi</div>
 
             <!-- Menu 2: Kamus Isyarat -->
-            <li class="nav-item">
-                <a class="nav-link" href="#section-kamus" onclick="switchSection('kamus')">
+            <li class="nav-item" id="nav-kamus">
+                <a class="nav-link" href="#kamus" onclick="switchSection('kamus'); return false;">
                     <i class="fas fa-fw fa-book-open"></i>
                     <span>Kamus Isyarat</span>
                 </a>
             </li>
 
             <!-- Menu 3: Pojok GEDSI -->
-            <li class="nav-item">
-                <a class="nav-link" href="#section-gedsi" onclick="switchSection('gedsi')">
+            <li class="nav-item" id="nav-gedsi">
+                <a class="nav-link" href="#gedsi" onclick="switchSection('gedsi'); return false;">
                     <i class="fas fa-fw fa-universal-access"></i>
                     <span>Pojok GEDSI</span>
                 </a>
             </li>
 
             <!-- Menu 4: Leaderboard -->
-            <li class="nav-item">
-                <a class="nav-link" href="#section-leaderboard" onclick="switchSection('leaderboard')">
+            <li class="nav-item" id="nav-leaderboard">
+                <a class="nav-link" href="#leaderboard" onclick="switchSection('leaderboard'); return false;">
                     <i class="fas fa-fw fa-trophy"></i>
                     <span>Papan Peringkat</span>
                 </a>
@@ -143,7 +143,7 @@
                                 <img class="img-profile rounded-circle" src="img/undraw_profile.svg" alt="Foto Profil">
                             </a>
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="#" onclick="resetProgress()">
+                                <a class="dropdown-item" href="#" onclick="resetProgress(); return false;">
                                     <i class="fas fa-redo fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Reset Progres Demo
                                 </a>
@@ -174,8 +174,10 @@
                         </div>
                     </div>
 
-                    <!-- SECTION 1: PETA BELAJAR (PATH) -->
-                    <div id="section-belajar">
+                    <!-- ========================================================= -->
+                    <!-- SECTION 1: PETA BELAJAR (PATH)                            -->
+                    <!-- ========================================================= -->
+                    <div id="section-belajar" class="app-section">
                         <div class="d-sm-flex align-items-center justify-content-between mb-3">
                             <h1 class="h4 mb-0 text-dark font-weight-bold">Jalur Pembelajaran (Isyarat + GEDSI)</h1>
                         </div>
@@ -267,32 +269,141 @@
                         </div>
                     </div>
 
-                    <!-- SECTION 2: POJOK GEDSI (Ringkasan Etika) -->
-                    <div id="section-gedsi" class="mt-3">
-                        <h2 class="h4 mb-3 text-dark font-weight-bold">Kartu Panduan Cepat GEDSI</h2>
+                    <!-- ========================================================= -->
+                    <!-- SECTION 2: KAMUS ISYARAT (BISINDO & SIBI)                 -->
+                    <!-- ========================================================= -->
+                    <div id="section-kamus" class="app-section d-none">
+                        <div class="d-sm-flex align-items-center justify-content-between mb-3">
+                            <h1 class="h4 mb-0 text-dark font-weight-bold">Kamus Video Isyarat (<span id="kamus-mode-title">BISINDO</span>)</h1>
+                        </div>
+
+                        <!-- Filter & Pencarian Kamus -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8 mb-2 mb-md-0">
+                                        <label for="kamus-search" class="sr-only">Cari Kosakata</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-primary text-white"><i class="fas fa-search"></i></span>
+                                            </div>
+                                            <input type="text" id="kamus-search" class="form-control" placeholder="Ketik kata yang dicari (contoh: Halo, Terima Kasih, Tolong)..." oninput="renderDictionary()">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="kamus-category" class="sr-only">Filter Kategori</label>
+                                        <select id="kamus-category" class="custom-select" onchange="renderDictionary()">
+                                            <option value="ALL">Semua Kategori</option>
+                                            <option value="Sapaan">Sapaan & Perkenalan</option>
+                                            <option value="Sopan Santun">Sopan Santun</option>
+                                            <option value="Peran & Inklusi">Peran & Inklusi</option>
+                                            <option value="Darurat">Situasi Darurat</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Grid Kartu Kamus -->
+                        <div class="row" id="kamus-grid">
+                            <!-- Dirender otomatis oleh app-learning.js -->
+                        </div>
+                    </div>
+
+                    <!-- ========================================================= -->
+                    <!-- SECTION 3: POJOK GEDSI (Literasi & Etika Inklusi)         -->
+                    <!-- ========================================================= -->
+                    <div id="section-gedsi" class="app-section d-none">
+                        <div class="d-sm-flex align-items-center justify-content-between mb-3">
+                            <h1 class="h4 mb-0 text-dark font-weight-bold">Pojok Literasi GEDSI (Gender Equality, Disability & Social Inclusion)</h1>
+                        </div>
+
                         <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <div class="card shadow-sm h-100">
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card border-left-primary shadow-sm h-100">
                                     <div class="card-body">
-                                        <h6 class="font-weight-bold text-primary"><i class="fas fa-comment-dots mr-1"></i> Gunakan Istilah "Tuli"</h6>
-                                        <p class="small text-dark mb-0">Gunakan kata <strong>Tuli</strong> (huruf kapital) untuk menghormati identitas budaya dan bahasa isyarat, hindari istilah medis seperti "tunarungu" atau "bisu".</p>
+                                        <h6 class="font-weight-bold text-primary"><i class="fas fa-comment-dots mr-2"></i>1. Identitas Budaya "Tuli"</h6>
+                                        <p class="small text-dark mb-0">Gunakan kata <strong>Tuli</strong> (huruf kapital) untuk menghormati identitas budaya dan komunitas pengguna bahasa isyarat. Hindari istilah medis atau berkonotasi negatif seperti "tunarungu" atau "bisu".</p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="card shadow-sm h-100">
+
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card border-left-success shadow-sm h-100">
                                     <div class="card-body">
-                                        <h6 class="font-weight-bold text-success"><i class="fas fa-hand-paper mr-1"></i> Tanya Sebelum Membantu</h6>
-                                        <p class="small text-dark mb-0">Jangan langsung memegang tangan teman netra atau mendorong kursi roda tanpa izin. Selalu tanyakan: <em>"Apakah ada yang bisa saya bantu?"</em></p>
+                                        <h6 class="font-weight-bold text-success"><i class="fas fa-hand-paper mr-2"></i>2. Tanya Sebelum Membantu</h6>
+                                        <p class="small text-dark mb-0">Jangan langsung memegang tangan teman netra atau mendorong kursi roda seseorang tanpa izin. Tanyakan dahulu: <em>"Permisi, apakah ada yang bisa saya bantu?"</em> dan ikuti arahan mereka.</p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="card shadow-sm h-100">
+
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card border-left-info shadow-sm h-100">
                                     <div class="card-body">
-                                        <h6 class="font-weight-bold text-info"><i class="fas fa-closed-captioning mr-1"></i> Aksesibilitas Konten</h6>
-                                        <p class="small text-dark mb-0">Pastikan setiap video presentasi memiliki takarir (<em>subtitle</em>) dan desain memakai kontras warna tinggi agar ramah bagi semua kalangan.</p>
+                                        <h6 class="font-weight-bold text-info"><i class="fas fa-closed-captioning mr-2"></i>3. Aksesibilitas Konten Digital</h6>
+                                        <p class="small text-dark mb-0">Setiap materi video wajib dilengkapi takarir (<em>closed caption</em>), gambar memiliki teks alternatif (<em>alt-text</em>), dan antarmuka aplikasi menyediakan rasio kontras warna yang jelas.</p>
                                     </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card border-left-warning shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h6 class="font-weight-bold text-warning"><i class="fas fa-eye mr-2"></i>4. Jaga Kontak Mata Saat Berbicara</h6>
+                                        <p class="small text-dark mb-0">Saat berkomunikasi dengan teman Tuli melalui bantuan Juru Bahasa Isyarat (JBI), tetap arahkan pandangan dan bicara langsung kepada teman Tuli tersebut, bukan kepada penerjemahnya.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card border-left-danger shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h6 class="font-weight-bold text-danger"><i class="fas fa-balance-scale mr-2"></i>5. Hapus Stereotip Gender</h6>
+                                        <p class="small text-dark mb-0">Peran kepemimpinan, kemampuan teknis (IT/rekayasa), dan tanggung jawab tim tidak ditentukan oleh gender. Pastikan pembagian tugas di kampus maupun tempat kerja berjalan adil dan setara.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card border-left-secondary shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h6 class="font-weight-bold text-dark"><i class="fas fa-users mr-2"></i>6. "Nothing About Us Without Us"</h6>
+                                        <p class="small text-dark mb-0">Perancangan kebijakan, fasilitas publik, maupun produk teknologi inklusif wajib melibatkan penyandang disabilitas dan kelompok rentan sejak tahap perencanaan awal.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ========================================================= -->
+                    <!-- SECTION 4: PAPAN PERINGKAT (LEADERBOARD)                  -->
+                    <!-- ========================================================= -->
+                    <div id="section-leaderboard" class="app-section d-none">
+                        <div class="d-sm-flex align-items-center justify-content-between mb-3">
+                            <h1 class="h4 mb-0 text-dark font-weight-bold">Papan Peringkat Pembelajar Inklusif</h1>
+                        </div>
+
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 font-weight-bold text-primary">Klasemen XP Mingguan</h6>
+                                <span class="badge badge-info">Selesaikan bab untuk naik peringkat!</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover mb-0" width="100%" cellspacing="0">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th style="width: 80px;" class="text-center">Peringkat</th>
+                                                <th>Nama Pembelajar</th>
+                                                <th>Mode Favorit</th>
+                                                <th class="text-center">Daily Streak</th>
+                                                <th class="text-right">Total XP</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="leaderboard-body">
+                                            <!-- Dirender otomatis oleh app-learning.js -->
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -354,7 +465,7 @@
                                 <i class="fas fa-play mr-1"></i> Normal (1x)
                             </button>
                             <button type="button" id="btn-speed-slow" class="btn btn-outline-secondary" onclick="setVideoSpeed(0.5)">
-                                <i class="fas fa-turtle mr-1"></i> Lambat (0.5x)
+                                <i class="fas fa-tachometer-alt mr-1"></i> Lambat (0.5x)
                             </button>
                         </div>
                     </div>
@@ -379,6 +490,36 @@
                     <button type="button" id="btn-next-question" class="btn btn-primary btn-lg px-4 font-weight-bold d-none" onclick="nextQuestion()">
                         Lanjut <i class="fas fa-arrow-right ml-1"></i>
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PREVIEW VIDEO KAMUS -->
+    <div class="modal fade" id="dictVideoModal" tabindex="-1" role="dialog" aria-labelledby="dictModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title font-weight-bold text-dark" id="dictModalTitle">Kata Isyarat</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <span id="dictModalModeBadge" class="badge badge-primary mb-2">BISINDO</span>
+                    <div class="video-frame mx-auto mb-3">
+                        <video id="dict-video-player" class="w-100 rounded" autoplay loop muted playsinline>
+                            <source id="dict-video-source" src="" type="video/mp4">
+                        </video>
+                    </div>
+                    <div class="btn-group btn-group-sm mb-3" role="group">
+                        <button type="button" id="dict-speed-normal" class="btn btn-secondary active" onclick="setDictVideoSpeed(1.0)">Normal (1x)</button>
+                        <button type="button" id="dict-speed-slow" class="btn btn-outline-secondary" onclick="setDictVideoSpeed(0.5)">Lambat (0.5x)</button>
+                    </div>
+                    <div class="alert alert-light border text-left small text-dark mb-0">
+                        <strong>Panduan Gerakan:</strong>
+                        <p id="dictModalDesc" class="mb-0 mt-1"></p>
+                    </div>
                 </div>
             </div>
         </div>
