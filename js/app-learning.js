@@ -28,6 +28,8 @@ async function checkUserSession() {
     currentUser = user;
 
     const userNameEl = document.getElementById("user-name");
+    const dropdownMenuEl = document.getElementById("user-dropdown-menu");
+
     if (currentUser) {
         const { data: profile } = await supabaseClient
             .from("profiles")
@@ -48,6 +50,22 @@ async function checkUserSession() {
                 if (navAdmin) navAdmin.classList.remove("d-none");
             }
         }
+
+        // Isi dropdown untuk user yang sudah login
+        if (dropdownMenuEl) {
+            dropdownMenuEl.innerHTML = `
+                <a class="dropdown-item" href="login.html">
+                    <i class="fas fa-exchange-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Ganti Akun
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item text-danger font-weight-bold" href="#" onclick="logoutUser(); return false;">
+                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-danger"></i>
+                    Keluar (Mode Tamu)
+                </a>
+            `;
+        }
+
         // Ambil riwayat bab yang sudah selesai
         const { data: progressRows } = await supabaseClient
             .from("user_progress")
@@ -61,7 +79,22 @@ async function checkUserSession() {
             });
         }
     } else {
-        userNameEl.innerHTML = `<a href="login.html" class="text-primary font-weight-bold">Masuk / Daftar</a>`;
+        // Tampilan & dropdown untuk Mode Tamu (Guest)
+        userNameEl.innerHTML = `<span class="text-primary font-weight-bold">Masuk / Daftar</span>`;
+
+        if (dropdownMenuEl) {
+            dropdownMenuEl.innerHTML = `
+                <a class="dropdown-item font-weight-bold" href="login.html">
+                    <i class="fas fa-sign-in-alt fa-sm fa-fw mr-2 text-primary"></i>
+                    Masuk
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item font-weight-bold" href="register.html">
+                    <i class="fas fa-user-plus fa-sm fa-fw mr-2 text-success"></i>
+                    Daftar
+                </a>
+            `;
+        }
     }
 }
 
@@ -435,9 +468,33 @@ async function nextQuestion() {
 
         updateTopbarUI();
         await renderLeaderboard();
+
+        // Isi data ke Modal Perayaan
+        const totalQ = chapter.questions.length;
+        document.getElementById("complete-chapter-title").innerText = chapter.title;
+        document.getElementById("complete-score-text").innerText = `${chapterScore} / ${totalQ}`;
+        document.getElementById("complete-xp-text").innerText = `+${chapter.xpReward} XP`;
+
+        const msgEl = document.getElementById("complete-message");
+        if (chapterScore === totalQ) {
+            msgEl.innerText = "Sempurna! Pemahaman bahasa isyarat dan literasi GEDSI-mu pada bab ini sangat baik.";
+        } else {
+            msgEl.innerText = "Kerja bagus! Terus berlatih menggunakan kamus isyarat agar semakin lancar.";
+        }
+
+        // Tutup modal kuis, lalu tampilkan modal perayaan secara berurutan
+        $('#quizModal').one('hidden.bs.modal', function () {
+            $('#quizCompleteModal').modal('show');
+        });
         $('#quizModal').modal('hide');
-        alert(`Selamat! Kamu menyelesaikan ${chapter.title} dan mendapatkan +${chapter.xpReward} XP!`);
     }
+}
+
+function goToLeaderboardFromModal() {
+    $('#quizCompleteModal').one('hidden.bs.modal', function () {
+        switchSection('leaderboard');
+    });
+    $('#quizCompleteModal').modal('hide');
 }
 
 async function logoutUser() {

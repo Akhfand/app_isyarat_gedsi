@@ -15,7 +15,7 @@
     <!-- Custom styles for SB Admin 2 -->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
     <!-- Custom styles untuk Aplikasi Isyarat & GEDSI -->
-    <link href="css/custom-gedsi.css?v=2" rel="stylesheet">
+    <link href="css/custom-gedsi.css?v=6" rel="stylesheet">
 </head>
 
 <body id="page-top">
@@ -136,23 +136,26 @@
                         <div class="topbar-divider d-none d-sm-block"></div>
 
                         <!-- Nav Item - User Information -->
+                        <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-dark font-weight-bold small" id="user-name">Pembelajar Inklusif</span>
-                                <img class="img-profile rounded-circle" src="img/undraw_profile.svg" alt="Foto Profil">
+                                <span class="img-profile rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center user-avatar-default" aria-hidden="true">
+                                    <i class="fas fa-user fa-sm"></i>
+                                </span>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="login.html">
-                                <i class="fas fa-exchange-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Ganti Akun
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger font-weight-bold" href="#" onclick="logoutUser(); return false;">
-                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-danger"></i>
-                                Keluar (Mode Tamu)
-                            </a>
-                        </div>
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown" id="user-dropdown-menu">
+                                <a class="dropdown-item font-weight-bold" href="login.html">
+                                    <i class="fas fa-sign-in-alt fa-sm fa-fw mr-2 text-primary"></i>
+                                    Masuk
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item font-weight-bold" href="register.html">
+                                    <i class="fas fa-user-plus fa-sm fa-fw mr-2 text-success"></i>
+                                    Daftar
+                                </a>
+                            </div>
                         </li>
 
                     </ul>
@@ -501,30 +504,43 @@
     </div>
 
     <!-- MODAL PREVIEW VIDEO KAMUS -->
-    <div class="modal fade" id="dictVideoModal" tabindex="-1" role="dialog" aria-labelledby="dictModalTitle" aria-hidden="true">
+    <!-- MODAL PERAYAAN SELESAI KUIS -->
+    <div class="modal fade" id="quizCompleteModal" tabindex="-1" role="dialog" aria-labelledby="completeModalTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-light">
-                    <h5 class="modal-title font-weight-bold text-dark" id="dictModalTitle">Kata Isyarat</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
-                        <span aria-hidden="true">&times;</span>
+            <div class="modal-content border-0 shadow-lg text-center">
+                <div class="modal-body p-4 p-md-5">
+                    <!-- Ikon Piala -->
+                    <div class="celebration-badge mx-auto mb-3">
+                        <i class="fas fa-trophy fa-3x text-warning"></i>
+                    </div>
+
+                    <h3 id="completeModalTitle" class="font-weight-bold text-dark mb-1">Bab Selesai!</h3>
+                    <p id="complete-chapter-title" class="small font-weight-bold text-primary mb-3">Bab 1: Fondasi Komunikasi & Budaya Tuli</p>
+                    <p id="complete-message" class="small text-dark mb-4">Kerja bagus! Kamu telah menyelesaikan seluruh materi pada bab ini.</p>
+
+                    <!-- Kartu Ringkasan Skor & XP -->
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <div class="p-3 rounded border bg-light stat-box">
+                                <div class="small text-muted font-weight-bold text-uppercase mb-1">Jawaban Benar</div>
+                                <div id="complete-score-text" class="h4 font-weight-bold text-dark mb-0">3 / 3</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 rounded border bg-light stat-box">
+                                <div class="small text-muted font-weight-bold text-uppercase mb-1">Poin Diperoleh</div>
+                                <div id="complete-xp-text" class="h4 font-weight-bold text-success mb-0">+50 XP</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Aksi -->
+                    <button type="button" class="btn btn-primary btn-block btn-lg font-weight-bold mb-2" data-dismiss="modal">
+                        Lanjut Belajar <i class="fas fa-arrow-right ml-1"></i>
                     </button>
-                </div>
-                <div class="modal-body text-center p-4">
-                    <span id="dictModalModeBadge" class="badge badge-primary mb-2">BISINDO</span>
-                    <div class="video-frame mx-auto mb-3">
-                        <video id="dict-video-player" class="w-100 rounded" autoplay loop muted playsinline>
-                            <source id="dict-video-source" src="" type="video/mp4">
-                        </video>
-                    </div>
-                    <div class="btn-group btn-group-sm mb-3" role="group">
-                        <button type="button" id="dict-speed-normal" class="btn btn-secondary active" onclick="setDictVideoSpeed(1.0)">Normal (1x)</button>
-                        <button type="button" id="dict-speed-slow" class="btn btn-outline-secondary" onclick="setDictVideoSpeed(0.5)">Lambat (0.5x)</button>
-                    </div>
-                    <div class="alert alert-light border text-left small text-dark mb-0">
-                        <strong>Panduan Gerakan:</strong>
-                        <p id="dictModalDesc" class="mb-0 mt-1"></p>
-                    </div>
+                    <button type="button" class="btn btn-outline-secondary btn-block font-weight-bold" onclick="goToLeaderboardFromModal()">
+                        <i class="fas fa-trophy text-warning mr-1"></i> Lihat Papan Peringkat
+                    </button>
                 </div>
             </div>
         </div>

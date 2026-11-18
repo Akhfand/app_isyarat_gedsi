@@ -1,40 +1,84 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Daftar Akun - IsyaratInklusi GEDSI</title>
+    <title>Daftar Akun - IsyaratGEDSI</title>
+
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800" rel="stylesheet">
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="css/custom-gedsi.css?v=4" rel="stylesheet">
 </head>
+
 <body class="bg-gradient-primary">
+
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-xl-6 col-lg-7 col-md-9">
-                <div class="card o-hidden border-0 shadow-lg my-5">
-                    <div class="card-body p-5">
-                        <div class="text-center">
-                            <h1 class="h4 text-gray-900 font-weight-bold mb-2">Buat Akun Pembelajar</h1>
-                            <p class="small text-muted mb-4">Mulai perjalanan belajar BISINDO, SIBI & Literasi GEDSI.</p>
+        <div class="row justify-content-center align-items-center min-vh-100 py-4">
+            <div class="col-xl-5 col-lg-6 col-md-8">
+                <div class="card o-hidden border-0 shadow-lg">
+                    <!-- Baris Atas: Tombol Aksesibilitas Kontras -->
+                    <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center pt-3 px-4">
+                        <span class="small font-weight-bold text-primary">
+                            <i class="fas fa-universal-access mr-1"></i> Akses Inklusif
+                        </span>
+                        <button type="button" id="btn-contrast" class="btn btn-sm btn-outline-dark" onclick="toggleHighContrast()" title="Mode Kontras Tinggi">
+                            <i class="fas fa-adjust mr-1"></i> Kontras
+                        </button>
+                    </div>
+
+                    <div class="card-body px-4 px-md-5 pb-5 pt-2">
+                        <!-- Identitas Brand -->
+                        <div class="text-center mb-4">
+                            <div class="auth-brand-badge">
+                                <i class="fas fa-hands fa-2x"></i>
+                            </div>
+                            <h1 class="h4 text-dark font-weight-bold mb-1">Buat Akun Pembelajar</h1>
+                            <p class="small text-muted mb-0">Mulai belajar BISINDO, SIBI & Literasi GEDSI secara interaktif.</p>
                         </div>
+
+                        <!-- Kotak Pesan Error Inline -->
+                        <div id="auth-error" class="alert alert-danger small d-none" role="alert"></div>
+
                         <form id="register-form" class="user">
                             <div class="form-group">
-                                <input type="text" id="reg-name" class="form-control form-control-user" placeholder="Nama Lengkap" required>
+                                <label for="reg-name" class="small font-weight-bold text-dark">Nama Lengkap</label>
+                                <input type="text" id="reg-name" class="form-control" placeholder="Nama yang tampil di Papan Peringkat" required>
                             </div>
+
                             <div class="form-group">
-                                <input type="email" id="reg-email" class="form-control form-control-user" placeholder="Alamat Email" required>
+                                <label for="reg-email" class="small font-weight-bold text-dark">Alamat Email</label>
+                                <input type="email" id="reg-email" class="form-control" placeholder="nama@email.com" required>
                             </div>
+
                             <div class="form-group">
-                                <input type="password" id="reg-password" class="form-control form-control-user" placeholder="Password (minimal 6 karakter)" minlength="6" required>
+                                <label for="reg-password" class="small font-weight-bold text-dark">Kata Sandi</label>
+                                <div class="input-group">
+                                    <input type="password" id="reg-password" class="form-control" placeholder="Minimal 6 karakter" minlength="6" required>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-toggle-pass" type="button" onclick="togglePasswordVisibility('reg-password', this)" aria-label="Tampilkan kata sandi" aria-pressed="false" title="Tampilkan kata sandi">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <button type="submit" id="btn-register" class="btn btn-primary btn-user btn-block font-weight-bold">
-                                Daftar Akun
+
+                            <button type="submit" id="btn-register" class="btn btn-primary btn-block btn-lg font-weight-bold mt-4">
+                                <i class="fas fa-user-plus mr-1"></i> Daftar Akun
                             </button>
                         </form>
-                        <hr>
-                        <div class="text-center">
+
+                        <hr class="my-4">
+
+                        <div class="text-center mb-2">
                             <a class="small font-weight-bold" href="login.html">Sudah punya akun? Masuk di sini!</a>
+                        </div>
+                        <div class="text-center">
+                            <a class="small text-secondary font-weight-bold" href="index.html">
+                                Lanjut tanpa login (Mode Tamu) <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -45,14 +89,49 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-client.js"></script>
     <script>
+        function applySavedContrast() {
+            const isHighContrast = localStorage.getItem('highContrast') === 'true';
+            const btn = document.getElementById("btn-contrast");
+            if (isHighContrast) {
+                document.body.classList.add("high-contrast");
+                if (btn) btn.className = "btn btn-sm btn-warning text-dark font-weight-bold";
+            } else {
+                document.body.classList.remove("high-contrast");
+                if (btn) btn.className = "btn btn-sm btn-outline-dark";
+            }
+        }
+
+        function toggleHighContrast() {
+            const isNowActive = document.body.classList.toggle("high-contrast");
+            localStorage.setItem('highContrast', isNowActive);
+            applySavedContrast();
+        }
+
+        function togglePasswordVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector("i");
+            const isHidden = input.type === "password";
+
+            input.type = isHidden ? "text" : "password";
+            icon.className = isHidden ? "fas fa-eye-slash" : "fas fa-eye";
+            btn.setAttribute("aria-pressed", String(isHidden));
+            btn.setAttribute("aria-label", isHidden ? "Sembunyikan kata sandi" : "Tampilkan kata sandi");
+            btn.title = isHidden ? "Sembunyikan kata sandi" : "Tampilkan kata sandi";
+        }
+
+        document.addEventListener("DOMContentLoaded", applySavedContrast);
+
         document.getElementById("register-form").addEventListener("submit", async (e) => {
             e.preventDefault();
             const btn = document.getElementById("btn-register");
-            btn.disabled = true;
-            btn.innerText = "Mendaftarkan...";
+            const errorBox = document.getElementById("auth-error");
 
-            const fullName = document.getElementById("reg-name").value;
-            const email = document.getElementById("reg-email").value;
+            errorBox.classList.add("d-none");
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Mendaftarkan...';
+
+            const fullName = document.getElementById("reg-name").value.trim();
+            const email = document.getElementById("reg-email").value.trim();
             const password = document.getElementById("reg-password").value;
 
             const { error } = await supabaseClient.auth.signUp({
@@ -62,13 +141,19 @@
             });
 
             if (error) {
-                alert("Gagal mendaftar: " + error.message);
+                errorBox.innerText = "Gagal mendaftar: " + error.message;
+                errorBox.classList.remove("d-none");
                 btn.disabled = false;
-                btn.innerText = "Daftar Akun";
+                btn.innerHTML = '<i class="fas fa-user-plus mr-1"></i> Daftar Akun';
             } else {
-                window.location.href = "index.html";
-            } 
+                btn.className = "btn btn-success btn-block btn-lg font-weight-bold mt-4";
+                btn.innerHTML = '<i class="fas fa-check mr-1"></i> Berhasil! Masuk ke aplikasi...';
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 800);
+            }
         });
     </script>
 </body>
+
 </html>

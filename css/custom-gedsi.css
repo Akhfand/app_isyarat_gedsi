@@ -139,3 +139,98 @@ body.high-contrast .quiz-option-btn {
 body.high-contrast .quiz-option-btn:hover:not(:disabled) {
     background-color: #2b2600 !important;
 }
+
+/* Lencana Piala Modal Selesai Kuis */
+.celebration-badge {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background-color: #fff8e1;
+    border: 3px solid #f6c23e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: popIn 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.4); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Penyesuaian Mode Kontras Tinggi untuk Modal Perayaan */
+body.high-contrast .celebration-badge {
+    background-color: #2b2600 !important;
+    border-color: #ffdd00 !important;
+}
+
+body.high-contrast .stat-box {
+    background-color: #000000 !important;
+    border: 2px solid #ffdd00 !important;
+}
+
+/* Penyesuaian Halaman Login & Register pada Mode Kontras Tinggi */
+body.high-contrast.bg-gradient-primary {
+    background-color: #000000 !important;
+    background-image: none !important;
+}
+
+.auth-brand-badge {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: #eef2ff;
+    color: #4e73df;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px auto;
+}
+
+body.high-contrast .auth-brand-badge {
+    background-color: #2b2600 !important;
+    color: #ffdd00 !important;
+    border: 2px solid #ffdd00 !important;
+}
+
+body.high-contrast a {
+    color: #ffdd00 !important;
+}
+
+/* Tombol Intip Password (Normal & Mode Kontras Tinggi) */
+.btn-toggle-pass {
+    border-color: #d1d3e2;
+    background-color: #f8f9fc;
+    color: #4e73df;
+}
+
+.btn-toggle-pass:hover {
+    background-color: #eaecf4;
+    color: #2e59d9;
+}
+
+body.high-contrast .btn-toggle-pass {
+    background-color: #000000 !important;
+    color: #ffdd00 !important;
+    border: 1px solid #ffdd00 !important;
+}
+
+body.high-contrast .btn-toggle-pass:hover {
+    background-color: #2b2600 !important;
+}
+
+/* Sembunyikan ikon intip password bawaan browser (Edge/IE) agar tidak ganda */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none !important;
+}
+
+/* Ikon Avatar Default pada Mode Kontras Tinggi */
+body.high-contrast .user-avatar-default {
+    background-color: #000000 !important;
+    border: 2px solid #ffdd00 !important;
+}
+
+body.high-contrast .user-avatar-default i {
+    color: #ffdd00 !important;
+}
