@@ -107,15 +107,30 @@
 
                                 <!-- Input Video (Muncul jika tipe soal = video) -->
                                 <div id="quiz-video-inputs" class="p-3 bg-light rounded border mb-3 d-none">
-                                    <div class="form-group mb-2">
-                                        <label class="small font-weight-bold text-primary">Video Soal BISINDO (.mp4)</label>
-                                        <input type="file" id="quiz-vid-bisindo" class="form-control-file small" accept="video/mp4,video/webm">
+                                    <!-- Pilihan Video BISINDO -->
+                                    <div class="form-group mb-3">
+                                        <label class="small font-weight-bold text-primary">Video Soal BISINDO</label>
+                                        <select id="quiz-existing-bisindo" class="custom-select custom-select-sm mb-2" onchange="toggleFileUploadInput('bisindo')">
+                                            <option value="">-- Upload File BISINDO Baru di Bawah --</option>
+                                        </select>
+                                        <div id="wrap-upload-bisindo">
+                                            <input type="file" id="quiz-vid-bisindo" class="form-control-file small" accept="video/mp4,video/webm">
+                                        </div>
                                     </div>
+
+                                    <hr class="my-2">
+
+                                    <!-- Pilihan Video SIBI -->
                                     <div class="form-group mb-0">
-                                        <label class="small font-weight-bold text-success">Video Soal SIBI (.mp4)</label>
-                                        <input type="file" id="quiz-vid-sibi" class="form-control-file small" accept="video/mp4,video/webm">
+                                        <label class="small font-weight-bold text-success">Video Soal SIBI</label>
+                                        <select id="quiz-existing-sibi" class="custom-select custom-select-sm mb-2" onchange="toggleFileUploadInput('sibi')">
+                                            <option value="">-- Upload File SIBI Baru di Bawah --</option>
+                                        </select>
+                                        <div id="wrap-upload-sibi">
+                                            <input type="file" id="quiz-vid-sibi" class="form-control-file small" accept="video/mp4,video/webm">
+                                        </div>
                                     </div>
-                                </div>
+                                </div>>
 
                                 <div class="form-group">
                                     <label class="small font-weight-bold text-dark">Pertanyaan / Narasi Kasus</label>
@@ -262,11 +277,86 @@
         function toggleQuizVideoFields() {
             const type = document.getElementById("quiz-type").value;
             const box = document.getElementById("quiz-video-inputs");
-            if (type === "video") box.classList.remove("d-none");
-            else box.classList.add("d-none");
+            if (type === "video") {
+                box.classList.remove("d-none");
+                populateExistingVideoDropdowns();
+            } else {
+                box.classList.add("d-none");
+            }
         }
 
-        // Helper upload video ke bucket 'sign-videos'
+        // Sembunyikan input upload file jika admin memilih video yang sudah ada
+        function toggleFileUploadInput(mode) {
+            const selectEl = document.getElementById(`quiz-existing-${mode}`);
+            const uploadWrap = document.getElementById(`wrap-upload-${mode}`);
+            const fileInput = document.getElementById(`quiz-vid-${mode}`);
+
+            if (selectEl.value !== "") {
+                uploadWrap.classList.add("d-none");
+                fileInput.value = "";
+            } else {
+                uploadWrap.classList.remove("d-none");
+            }
+        }
+
+        // Isi dropdown dengan video dari Kamus & folder Storage 'sign-videos'
+        async function populateExistingVideoDropdowns() {
+            const selectBisindo = document.getElementById("quiz-existing-bisindo");
+            const selectSibi = document.getElementById("quiz-existing-sibi");
+            if (!selectBisindo || !selectSibi) return;
+
+            const bisindoMap = new Map();
+            const sibiMap = new Map();
+
+            // 1. Ambil video yang sudah tertaut di Kamus (label lebih mudah dibaca)
+            cachedDictList.forEach(item => {
+                if (item.video_bisindo && item.video_bisindo.startsWith("http")) {
+                    bisindoMap.set(item.video_bisindo, `[Kamus] ${item.kata}`);
+                }
+                if (item.video_sibi && item.video_sibi.startsWith("http")) {
+                    sibiMap.set(item.video_sibi, `[Kamus] ${item.kata}`);
+                }
+            });
+
+            // 2. Ambil juga file lain yang ada di bucket Storage 'sign-videos'
+            const { data: bisindoFiles } = await supabaseClient.storage.from('sign-videos').list('bisindo');
+            if (bisindoFiles) {
+                bisindoFiles.forEach(file => {
+                    if (file.name && !file.name.startsWith('.')) {
+                        const url = supabaseClient.storage.from('sign-videos').getPublicUrl(`bisindo/${file.name}`).data.publicUrl;
+                        if (!bisindoMap.has(url)) bisindoMap.set(url, `[Storage] ${file.name}`);
+                    }
+                });
+            }
+
+            const { data: sibiFiles } = await supabaseClient.storage.from('sign-videos').list('sibi');
+            if (sibiFiles) {
+                sibiFiles.forEach(file => {
+                    if (file.name && !file.name.startsWith('.')) {
+                        const url = supabaseClient.storage.from('sign-videos').getPublicUrl(`sibi/${file.name}`).data.publicUrl;
+                        if (!sibiMap.has(url)) sibiMap.set(url, `[Storage] ${file.name}`);
+                    }
+                });
+            }
+
+            // Render opsi dropdown BISINDO
+            let htmlBisindo = `<option value="">-- Upload File BISINDO Baru di Bawah --</option>`;
+            bisindoMap.forEach((label, url) => {
+                htmlBisindo += `<option value="${url}">${label}</option>`;
+            });
+            selectBisindo.innerHTML = htmlBisindo;
+            toggleFileUploadInput('bisindo');
+
+            // Render opsi dropdown SIBI
+            let htmlSibi = `<option value="">-- Upload File SIBI Baru di Bawah --</option>`;
+            sibiMap.forEach((label, url) => {
+                htmlSibi += `<option value="${url}">${label}</option>`;
+            });
+            selectSibi.innerHTML = htmlSibi;
+            toggleFileUploadInput('sibi');
+        }
+
+        // Helper upload video baru ke bucket 'sign-videos'
         async function uploadVideoIfPresent(fileInputId, folder, slugName) {
             const input = document.getElementById(fileInputId);
             if (!input || !input.files || input.files.length === 0) return null;
@@ -288,7 +378,7 @@
             return data.publicUrl;
         }
 
-        // Muat daftar kamus di tabel bawah untuk manajemen & hapus
+        // Muat daftar kamus
         async function loadAdminDictionaryList() {
             const tbody = document.getElementById("admin-dict-table-body");
             const { data, error } = await supabaseClient
@@ -302,6 +392,8 @@
             }
 
             cachedDictList = data || [];
+            await populateExistingVideoDropdowns();
+
             if (cachedDictList.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="text-center">Belum ada kosakata di kamus.</td></tr>`;
                 return;
@@ -338,7 +430,22 @@
             return decodeURIComponent(publicUrl.split('/sign-videos/')[1]);
         }
 
-        // Hapus item kamus beserta file videonya di Storage
+        // Hapus file dari Storage HANYA jika tidak lagi dipakai oleh Kamus maupun Soal Kuis lain
+        async function safeRemoveStorageVideos(urlsToCheck) {
+            for (const url of urlsToCheck) {
+                const path = extractStoragePath(url);
+                if (!path) continue;
+
+                const usedInDict = cachedDictList.some(d => d.video_bisindo === url || d.video_sibi === url);
+                const usedInQuiz = cachedQuizList.some(q => q.video_bisindo === url || q.video_sibi === url);
+
+                if (!usedInDict && !usedInQuiz) {
+                    await supabaseClient.storage.from('sign-videos').remove([path]);
+                }
+            }
+        }
+
+        // Hapus item kamus
         async function deleteDictionaryItem(id) {
             const item = cachedDictList.find(d => d.id === id);
             if (!item) return;
@@ -346,31 +453,18 @@
             if (!confirm(`Yakin ingin menghapus kosakata "${item.kata}" dari kamus?`)) return;
 
             try {
-                // 1. Hapus file video dari bucket Storage jika ada
-                const pathsToRemove = [
-                    extractStoragePath(item.video_bisindo),
-                    extractStoragePath(item.video_sibi)
-                ].filter(Boolean);
-
-                if (pathsToRemove.length > 0) {
-                    await supabaseClient.storage.from('sign-videos').remove(pathsToRemove);
-                }
-
-                // 2. Hapus baris data dari tabel dictionary
-                const { error } = await supabaseClient
-                    .from("dictionary")
-                    .delete()
-                    .eq("id", id);
-
+                const { error } = await supabaseClient.from("dictionary").delete().eq("id", id);
                 if (error) throw error;
 
                 await loadAdminDictionaryList();
+                await safeRemoveStorageVideos([item.video_bisindo, item.video_sibi]);
+                await populateExistingVideoDropdowns();
             } catch (err) {
                 alert("Gagal menghapus kosakata: " + err.message);
             }
         }
 
-        // Muat daftar soal kuis dari tabel 'questions'
+        // Muat daftar soal kuis
         async function loadAdminQuizList() {
             const tbody = document.getElementById("admin-quiz-table-body");
             const { data, error } = await supabaseClient
@@ -421,7 +515,7 @@
             }).join("");
         }
 
-        // Hapus soal kuis beserta file videonya di Storage (jika tipe video)
+        // Hapus soal kuis
         async function deleteQuizItem(id) {
             const item = cachedQuizList.find(q => q.id === id);
             if (!item) return;
@@ -429,23 +523,12 @@
             if (!confirm(`Yakin ingin menghapus soal dari Bab ${item.chapter_id} ini?`)) return;
 
             try {
-                const pathsToRemove = [
-                    extractStoragePath(item.video_bisindo),
-                    extractStoragePath(item.video_sibi)
-                ].filter(Boolean);
-
-                if (pathsToRemove.length > 0) {
-                    await supabaseClient.storage.from('sign-videos').remove(pathsToRemove);
-                }
-
-                const { error } = await supabaseClient
-                    .from("questions")
-                    .delete()
-                    .eq("id", id);
-
+                const { error } = await supabaseClient.from("questions").delete().eq("id", id);
                 if (error) throw error;
 
                 await loadAdminQuizList();
+                await safeRemoveStorageVideos([item.video_bisindo, item.video_sibi]);
+                await populateExistingVideoDropdowns();
             } catch (err) {
                 alert("Gagal menghapus soal: " + err.message);
             }
@@ -487,7 +570,7 @@
             }
         });
 
-        // Submit Form Kuis
+        // Submit Form Kuis (Mendukung video yang sudah diupload maupun file baru)
         document.getElementById("form-quiz").addEventListener("submit", async (e) => {
             e.preventDefault();
             const btn = document.getElementById("btn-save-quiz");
@@ -501,8 +584,16 @@
                 let urlSibi = null;
 
                 if (type === "video") {
-                    urlBisindo = await uploadVideoIfPresent("quiz-vid-bisindo", "bisindo", `quiz_bab${chapterId}`);
-                    urlSibi = await uploadVideoIfPresent("quiz-vid-sibi", "sibi", `quiz_bab${chapterId}`);
+                    const existingBisindo = document.getElementById("quiz-existing-bisindo").value;
+                    const existingSibi = document.getElementById("quiz-existing-sibi").value;
+
+                    urlBisindo = existingBisindo !== ""
+                        ? existingBisindo
+                        : await uploadVideoIfPresent("quiz-vid-bisindo", "bisindo", `quiz_bab${chapterId}`);
+
+                    urlSibi = existingSibi !== ""
+                        ? existingSibi
+                        : await uploadVideoIfPresent("quiz-vid-sibi", "sibi", `quiz_bab${chapterId}`);
                 }
 
                 const optionsArray = [
@@ -524,10 +615,9 @@
 
                 if (error) throw error;
 
-                alert("Soal kuis baru berhasil disimpan ke database!");
                 e.target.reset();
                 toggleQuizVideoFields();
-                await loadAdminQuizList ();
+                await loadAdminQuizList();
             } catch (err) {
                 alert("Error: " + err.message);
             } finally {
